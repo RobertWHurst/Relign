@@ -49,10 +49,15 @@ relign.parallel([
 ### Control Flow
 
 #### Auto
-
 ```
 relign.auto(tasks) -> promise(results)
 ```
+
+Auto provides a way to organize a set of interdependent tasks and execute them
+in the most efficient way possible. Biased on the the dependencies associated
+with each task, auto will figure out which tasks will run first, and start
+ones that depend upon tasks completed. Once all of the tasks are complete auto
+will resolve the results.
 
 ```javascript
 relign.auto({
@@ -70,6 +75,11 @@ relign.auto({
 ```
 relign.parallel(tasks) -> promise(results)
 ```
+
+Parallel accepts an array or object of tasks. It will then execute each of those
+tasks in within the same tick. Once all of the tasks resolve parallel will
+resolve the results. The results object will match the same structure as the
+tasks object or array.
 
 ```javascript
 relign.parallel({
@@ -90,6 +100,11 @@ relign.parallel([
 ```
 relign.parallelLimit(tasks, limit) -> promise(results)
 ```
+
+Parallel limit behaves almost identical to [parallel](#parallel), but will
+not execute more than a fixed limit of tasks at a time. Once a task resolves and
+there are additional tasks to execute, another task will be executed. Once all
+of the tasks have been resolved parallelLimit resolves the results.
 
 ```javascript
 relign.parallelLimit({
@@ -112,8 +127,14 @@ relign.parallelLimit([
 #### Parallel Map
 
 ```
-relign.parallelMap(items, worker) -> promise(results)
+relign.parallelMap(items, worker(item) -> promise(result)) -> promise(results)
+relign.parallelMap(items, worker(item) -> result) -> promise(results)
 ```
+
+Parallel map takes a array or object of items and executes an asynchronous
+worker upon each item at once. Once the worker has resolved a result for all
+of the items parallel map resolves the results. The results object will match
+the same structure as the items object or array.
 
 ```javascript
 relign.parallelMap(resourceUrls, url => download(url))
@@ -127,6 +148,10 @@ relign.parallelMap(resourceUrls, url => download(url))
 relign.parallelMap(items, worker, limit) -> promise(results)
 ```
 
+Parallel Map Limit behaves nearly identically to [parallel map](#parallel-map)
+with the exception that it takes a limit and restricts the amount of items
+the worker can process at the same time by that limit.
+
 ```javascript
 relign.parallelMap(resourceUrls, url => download(url), 6)
   .then(resources => store(resources));
@@ -134,14 +159,63 @@ relign.parallelMap(resourceUrls, url => download(url), 6)
 
 #### Series
 
+```
+relign.series(tasks) -> promise(results)
+```
+
 #### Series Map
+
+```
+relign.series(items, worker) -> promise(results)
+```
 
 ### Utilities
 
 #### Exec
 
+```
+relign.exec(fn() => promise(result)) -> promise(result)
+relign.exec(fn() => result) -> promise(result)
+relign.exec(value) -> promise(value)
+```
+
+Exec is a utility for executing functions or wrapping values with a promise.
+It's used extensively by relign internally for normalizing arguments.
+
+If exec is given a function that returns a promise then exec will resolve the
+value resolved by that promise.
+
+If exec is given a function that returns a value then exec will resolve that
+value.
+
+If exec is given a value then it will resolve that value.
+
 #### Next Tick
+
+```
+relign.nextTick(fn() -> promise(result)) -> promise(result)
+relign.nextTick(fn() -> result) -> promise(result)
+relign.nextTick(value) -> promise(value)
+relign.nextTick() -> promise()
+```
+
+Next tick is a wrapper for node's built in next tick. It executes a given
+function in the following tick, and resolves in the value returned or resolved
+by the function. If a value is given instead of a function, then the value will
+be resolved the following tick.
 
 #### Set Interval
 
+```
+relign.setInterval(fn() -> promise(), duration) -> intervalPromise()
+relign.setInterval(fn(), duration) -> intervalPromise()
+```
+
 #### Set Timeout
+
+```
+relign.setTimeout(fn() -> promise(result), duration) -> timeoutPromise(result)
+relign.setTimeout(fn() -> result, duration) -> timeoutPromise(result)
+relign.setTimeout(value, duration) -> timeoutPromise(value)
+relign.setTimeout(duration) -> timeoutPromise()
+```

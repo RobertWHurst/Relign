@@ -4,10 +4,6 @@ const exec = require('./exec');
 class IntervalPromise extends Promise {
 
   constructor(fn, duration) {
-    if (typeof fn === 'number') {
-      duration = fn;
-      fn       = undefined;
-    }
     let _resolve, _intervalId;
     super((resolve, reject) => {
       _resolve = resolve;
