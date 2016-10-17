@@ -11,9 +11,7 @@
   "license": "MIT",
   "devDependencies": {
     "istanbul": "^0.4.5",
-    "mocha": "^3.1.2"
-  },
-  "dependencies": {
+    "mocha": "^3.1.2",
     "istanbul": "^0.4.5"
   },
   "repository": {
