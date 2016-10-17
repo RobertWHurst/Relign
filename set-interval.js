@@ -40,5 +40,5 @@ const setInterval = (fn, d = 0) => {
 };
 
 
-exports.module.exports = setInterval;
+exports = module.exports = setInterval;
 exports.IntervalPromise = IntervalPromise;

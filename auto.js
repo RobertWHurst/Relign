@@ -1,4 +1,4 @@
-const parallel = require('./each');
+const parallel = require('./parallel');
 
 
 const auto = (tasks) => {

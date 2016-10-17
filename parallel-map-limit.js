@@ -1,7 +1,7 @@
 const parallelLimit = require('./parallel-limit');
 
 
-const parallelLimitMap = (items, fn, limit) => {
+const parallelMapLimit = (items, fn, limit) => {
   for (const prop in items) {
     const item = items[prop];
     items[prop] = () => fn(item);
@@ -10,4 +10,4 @@ const parallelLimitMap = (items, fn, limit) => {
 };
 
 
-module.exports = parallelLimitMap;
+module.exports = parallelMapLimit;
