@@ -49,7 +49,8 @@ relign.parallel([
 ### Control Flow
 
 #### Auto
-```
+
+```javascript
 relign.auto(tasks) -> promise(results)
 ```
 
@@ -72,7 +73,7 @@ relign.auto({
 
 #### Parallel
 
-```
+```javascript
 relign.parallel(tasks) -> promise(results)
 ```
 
@@ -97,7 +98,7 @@ relign.parallel([
 
 #### Parallel Limit
 
-```
+```javascript
 relign.parallelLimit(tasks, limit) -> promise(results)
 ```
 
@@ -126,7 +127,7 @@ relign.parallelLimit([
 
 #### Parallel Map
 
-```
+```javascript
 relign.parallelMap(items, worker(item) -> promise(result)) -> promise(results)
 relign.parallelMap(items, worker(item) -> result) -> promise(results)
 ```
@@ -144,7 +145,7 @@ relign.parallelMap(resourceUrls, url => download(url))
 
 #### Parallel Map Limit
 
-```
+```javascript
 relign.parallelMap(items, worker, limit) -> promise(results)
 ```
 
@@ -159,13 +160,13 @@ relign.parallelMap(resourceUrls, url => download(url), 6)
 
 #### Series
 
-```
+```javascript
 relign.series(tasks) -> promise(results)
 ```
 
 #### Series Map
 
-```
+```javascript
 relign.series(items, worker) -> promise(results)
 ```
 
@@ -173,7 +174,7 @@ relign.series(items, worker) -> promise(results)
 
 #### Exec
 
-```
+```javascript
 relign.exec(fn() => promise(result)) -> promise(result)
 relign.exec(fn() => result) -> promise(result)
 relign.exec(value) -> promise(value)
@@ -192,7 +193,7 @@ If exec is given a value then it will resolve that value.
 
 #### Next Tick
 
-```
+```javascript
 relign.nextTick(fn() -> promise(result)) -> promise(result)
 relign.nextTick(fn() -> result) -> promise(result)
 relign.nextTick(value) -> promise(value)
@@ -206,14 +207,14 @@ be resolved the following tick.
 
 #### Set Interval
 
-```
+```javascript
 relign.setInterval(fn() -> promise(), duration) -> intervalPromise()
 relign.setInterval(fn(), duration) -> intervalPromise()
 ```
 
 #### Set Timeout
 
-```
+```javascript
 relign.setTimeout(fn() -> promise(result), duration) -> timeoutPromise(result)
 relign.setTimeout(fn() -> result, duration) -> timeoutPromise(result)
 relign.setTimeout(value, duration) -> timeoutPromise(value)
