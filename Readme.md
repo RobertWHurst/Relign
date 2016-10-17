@@ -1,4 +1,4 @@
-[![Travis](https://img.shields.io/travis/rust-lang/rust.svg)](https://travis-ci.org/RobertWHurst/relign)
+[![Travis](https://img.shields.io/travis/RobertWHurst/relign.svg)](https://travis-ci.org/RobertWHurst/relign)
 [![Coveralls](https://img.shields.io/coveralls/jekyll/jekyll.svg)](https://coveralls.io/github/RobertWHurst/relign)
 [![npm](https://img.shields.io/npm/v/relign.svg)](https://www.npmjs.com/package/relign)
 
