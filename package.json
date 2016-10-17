@@ -1,6 +1,6 @@
 {
   "name": "relign",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Relign is a control flow library for promises heavily inspired by async",
   "main": "index.js",
   "scripts": {
@@ -11,8 +11,7 @@
   "license": "MIT",
   "devDependencies": {
     "istanbul": "^0.4.5",
-    "mocha": "^3.1.2",
-    "istanbul": "^0.4.5"
+    "mocha": "^3.1.2"
   },
   "repository": {
     "type": "git",
