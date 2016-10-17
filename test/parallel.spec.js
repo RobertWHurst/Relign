@@ -3,21 +3,21 @@ const nextTick = require('../next-tick');
 const parallel = require('../parallel');
 
 
-describe('parallel(fns) -> promise(data)', () => {
+describe('parallel(tasks) -> promise(results)', () => {
 
-  it('runs an array of promise returning functions and resolves with all of the data', () =>
+  it('runs an array of promise returning functions and resolves with all of the results', () =>
     parallel([
       1,
       () => 2,
       () => new Promise(r => setTimeout(r(3), 100))
-    ]).then(data => assert(data, [1, 2, 3])));
+    ]).then(results => assert(results, [1, 2, 3])));
 
-  it('runs an object of promise returning functions and resolves with all of the data', () =>
+  it('runs an object of promise returning functions and resolves with all of the results', () =>
     parallel({
       a: 1,
       b: () => 2,
       c: () => new Promise(r => setTimeout(r(3), 100))
-    }).then(data => assert(data, { a: 1, b: 2, c: 3 })));
+    }).then(results => assert(results, { a: 1, b: 2, c: 3 })));
 
   it('runs all the functions in parallel');
 

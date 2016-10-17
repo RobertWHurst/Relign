@@ -129,6 +129,12 @@ relign.parallelLimit([
 ], 2).then(files => parse(files));
 ```
 
+#### Series
+
+```javascript
+relign.series(tasks) -> promise(results)
+```
+
 #### Parallel Map
 
 ```javascript
@@ -162,17 +168,25 @@ relign.parallelMap(resourceUrls, url => download(url), 6)
   .then(resources => store(resources));
 ```
 
-#### Series
-
-```javascript
-relign.series(tasks) -> promise(results)
-```
-
 #### Series Map
 
 ```javascript
 relign.series(items, worker) -> promise(results)
 ```
+
+#### Parallel Concat
+
+```javascript
+relign.parallelConcat(items, worker) -> promise(results)
+```
+
+
+#### Series Concat
+
+```javascript
+relign.seriesConcat(items, worker) -> promise(results)
+```
+
 
 ### Utilities
 

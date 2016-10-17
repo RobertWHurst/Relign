@@ -3,7 +3,7 @@ const parallel = require('./parallel');
 
 
 const auto = (tasks) => {
-  const data = {};
+  const results = typeof tasks.length === 'number' ? [] : {};
 
   const executeNextTasks = (lastTaskName) => {
     const nextTaskNames = Object.keys(tasks)
@@ -19,7 +19,7 @@ const auto = (tasks) => {
 
       return exec(task[0])
         .then((value) => {
-          data[nextTaskName] = value;
+          results[nextTaskName] = value;
         })
         .then(() => {
           for (const taskName in tasks) {
@@ -31,7 +31,7 @@ const auto = (tasks) => {
         .then(executeNextTasks);
     });
 
-    return Promise.all(promises).then(() => data);
+    return Promise.all(promises).then(() => results);
   }
 
   const taskNames = Object.keys(tasks);

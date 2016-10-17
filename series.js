@@ -1,15 +1,16 @@
 const exec = require('./exec');
 
 
-const series = (fns) => {
-  const data  = {};
-  const props = Object.keys(fns);
-  const rec   = () => {
+const series = (tasks) => {
+  const results = typeof tasks.length === 'number' ? [] : {};
+  const props   = Object.keys(tasks);
+
+  const rec = () => {
     const prop = props.shift();
-    const fn   = fns[prop];
+    const fn   = tasks[prop];
     return fn ?
-      exec(fn).then(v => { data[prop] = v; }).then(rec) :
-      Promise.resolve(data);
+      exec(fn).then(v => { results[prop] = v; }).then(rec) :
+      Promise.resolve(results);
   };
 
   return rec();

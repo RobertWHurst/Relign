@@ -1,11 +1,11 @@
 const exec = require('./exec');
 
 
-const parallel = (fns) => {
-  const data     = {};
-  const props    = Object.keys(fns);
-  const promises = props.map(p => exec(fns[p]).then(v => { data[p] = v; }));
-  return Promise.all(promises).then(() => data);
+const parallel = (tasks) => {
+  const results  = typeof tasks.length === 'number' ? [] : {};
+  const props    = Object.keys(tasks);
+  const promises = props.map(p => exec(tasks[p]).then(v => { results[p] = v; }));
+  return Promise.all(promises).then(() => results);
 };
 
 
