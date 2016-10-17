@@ -1,0 +1,38 @@
+{
+  "name": "relign",
+  "version": "0.1.0",
+  "description": "Relign is a control flow library for promises heavily inspired by async",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --bail test/*.spec.js",
+    "cover": "istanbul cover _mocha test/*.spec.js"
+  },
+  "author": "Robert Hurst <robertwhurst@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.2"
+  },
+  "dependencies": {
+    "istanbul": "^0.4.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobertWHurst/relign.git"
+  },
+  "keywords": [
+    "async",
+    "control flow",
+    "promises",
+    "yield",
+    "block",
+    "parallel",
+    "series",
+    "async map",
+    "map"
+  ],
+  "bugs": {
+    "url": "https://github.com/RobertWHurst/relign/issues"
+  },
+  "homepage": "https://github.com/RobertWHurst/relign#readme"
+}
