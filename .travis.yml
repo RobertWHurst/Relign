@@ -3,4 +3,4 @@ node_js:
   - "6"
 after_success:
   - npm i coveralls mocha-lcov-reporter
-  - istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls
+  - ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls
