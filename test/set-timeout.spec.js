@@ -1,66 +1,113 @@
-const assert     = require('assert');
-const setTimeout = require('../set-timeout');
+const assert        = require('assert');
+const sinon         = require('sinon');
+const setTimeout    = require('../set-timeout');
 
 
 describe('setTimeout(fn() -> promise(val), duration) -> timeoutPromise(val)', () => {
 
-  it('executes the fn once the duration elapses then resolves the value resolved by the fn', () => {
-    const start = Date.now();
+  it('executes the fn once the duration elapses then resolves the value resolved by the fn', (done) => {
+    const clock = sinon.useFakeTimers();
+    const cb    = sinon.stub();
 
-    return setTimeout(() => {
-      return new Promise((resolve) => {
-        global.setTimeout(() => resolve('val'), 10);
-      });
-    }, 10).then(v => {
-      const end = Date.now();
-
-      assert.ok(end - start >= 20);
-      assert.equal(v, 'val');
+    const executor = sinon.spy((resolve) => {
+      global.setTimeout(() => resolve('val'), 10);
     });
+
+    setTimeout(() => {
+      return new Promise(executor);
+    }, 10).then(cb);
+
+    sinon.assert.notCalled(executor);
+    sinon.assert.notCalled(cb);
+
+    clock.tick(10);
+
+    sinon.assert.calledOnce(executor);
+    sinon.assert.notCalled(cb);
+
+    clock.tick(10);
+    clock.restore();
+    global.setTimeout(() => {
+
+      sinon.assert.calledOnce(cb);
+      sinon.assert.calledWith(cb, 'val');
+
+      done();
+    }, 0);
   });
 });
 
 
 describe('setTimeout(fn() -> val, duration) -> timeoutPromise(val)', () => {
 
-  it('executes the fn once the duration elapses then resolves the value returned by the fn', () => {
-    const start = Date.now();
+  it('executes the fn once the duration elapses then resolves the value returned by the fn', (done) => {
+    const clock = sinon.useFakeTimers();
+    const cb    = sinon.stub();
 
-    return setTimeout(() => 'val', 10).then(v => {
-      const end = Date.now();
+    const fn = sinon.spy(() => 'val');
 
-      assert.ok(end - start >= 10);
-      assert.equal(v, 'val');
-    });
+    setTimeout(fn, 10).then(cb);
+
+    sinon.assert.notCalled(fn);
+    sinon.assert.notCalled(cb);
+
+    clock.tick(10);
+    clock.restore();
+
+    sinon.assert.calledOnce(fn);
+
+    global.setTimeout(() => {
+
+      sinon.assert.calledOnce(cb);
+      sinon.assert.calledWith(cb, 'val');
+
+      done();
+    }, 0);
   });
 });
 
 
 describe('setTimeout(val, duration) -> timeoutPromise(val)', () => {
 
-  it('resolves the value given after the duration elapses', () => {
-    const start = Date.now();
+  it('resolves the value given after the duration elapses', (done) => {
+    const clock = sinon.useFakeTimers();
+    const cb    = sinon.stub();
 
-    return setTimeout('val', 10).then(v => {
-      const end = Date.now();
+    setTimeout('val', 10).then(cb);
 
-      assert.ok(end - start >= 10);
-      assert.equal(v, 'val');
-    });
+    sinon.assert.notCalled(cb);
+
+    clock.tick(10);
+    clock.restore();
+    global.setTimeout(() => {
+
+      sinon.assert.calledOnce(cb);
+      sinon.assert.calledWith(cb, 'val');
+
+      done();
+    }, 0);
   });
 });
 
 
 describe('setTimeout(duration) -> timeoutPromise()', () => {
 
-  it('resolves after the duration elapses', () => {
-    const start = Date.now();
+  it('resolves after the duration elapses', (done) => {
+    const clock = sinon.useFakeTimers();
+    const cb    = sinon.stub();
 
-    return setTimeout(10).then(() => {
-      const end = Date.now();
+    setTimeout(10).then(cb);
 
-      assert.ok(end - start >= 10);
-    });
+    sinon.assert.notCalled(cb);
+
+    clock.tick(10);
+    clock.restore();
+    global.setTimeout(() => {
+
+      sinon.assert.calledOnce(cb);
+
+      done();
+    }, 0);
   });
 });
 
@@ -70,29 +117,48 @@ describe('new TimeoutPromise(fn, duration)', () => {
 
   describe('#clear(newVal) -> this', () => {
 
-    it('prevents the timeout fn from being called and causes the timeoutPromise to resolve newVal immediately', () => {
-      const start = Date.now();
+    it('prevents the timeout fn from being called and causes the timeoutPromise to resolve newVal immediately', (done) => {
+      const clock = sinon.useFakeTimers();
+      const cb    = sinon.stub();
 
-      return setTimeout('val', 10).then(v => {
-        const end = Date.now();
+      const timeoutPromise = setTimeout('val', 10).then(cb);
 
-        assert.ok(end - start < 10);
-        assert.equal(v, 'newVal');
-      }).clear('newVal');
-    })
+      clock.tick(1);
+
+      timeoutPromise.clear('newVal');
+
+      clock.restore();
+      global.setTimeout(() => {
+
+        sinon.assert.calledOnce(cb);
+        sinon.assert.calledWith(cb, 'newVal');
+
+        done();
+      });
+    });
   });
 
 
   describe('#clear() -> this', () => {
 
-    it('prevents the timeout fn from being called and causes the timeoutPromise to resolve immediately', () => {
-      const start = Date.now();
+    it('prevents the timeout fn from being called and causes the timeoutPromise to resolve immediately', (done) => {
+      const clock = sinon.useFakeTimers();
+      const cb    = sinon.stub();
 
-      return setTimeout('val', 10).then(() => {
-        const end = Date.now();
+      const timeoutPromise = setTimeout('val', 10).then(cb);
 
-        assert.ok(end - start < 10);
-      }).clear();
+      clock.tick(1);
+
+      timeoutPromise.clear();
+
+      clock.restore();
+      global.setTimeout(() => {
+
+        sinon.assert.calledOnce(cb);
+        sinon.assert.calledWith(cb, undefined);
+
+        done();
+      });
     })
   });
 });
