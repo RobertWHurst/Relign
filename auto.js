@@ -1,26 +1,55 @@
+const exec     = require('./exec');
 const parallel = require('./parallel');
 
 
 const auto = (tasks) => {
-  const data           = {};
-  const props          = Object.keys(tasks);
-  const unblockedProps = props
-    .map(p => typeof tasks[p] === 'function' ? [tasks[p]] : tasks[p])
-    .filter(p => typeof tasks[p][0] === 'function');
+  const data = {};
 
-  return parallel(unblockedProps.map(p => () => {
-    data[p] = tasks[p](data);
-  })).then(() => {
-    unblockedProps.forEach(p => { delete tasks[p]; });
-    const nexProps = props.filter(p => !!tasks[p]);
+  const executeNextTasks = (lastTaskName) => {
+    const nextTaskNames = Object.keys(tasks)
+      .filter(n => typeof tasks[n][0] === 'function');
 
-    if (nexProps.length < 1) { return Promise.resolve(data); }
+    if (nextTaskNames.length < 0) {
+      return Promise.resolve();
+    }
 
-    nexProps.forEach(p => {
-      tasks[p] = tasks[p].filter(d => !unblockedProps.includes(d));
+    const promises = nextTaskNames.map((nextTaskName) => {
+      const task = tasks[nextTaskName];
+      delete tasks[nextTaskName];
+
+      return exec(task[0])
+        .then((value) => {
+          data[nextTaskName] = value;
+        })
+        .then(() => {
+          for (const taskName in tasks) {
+            const task = tasks[taskName];
+            const i    = task.indexOf(nextTaskName);
+            if (i > -1) { task.splice(i, 1); }
+          }
+        })
+        .then(executeNextTasks);
     });
-    return auto(tasks);
-  });
+
+    return Promise.all(promises).then(() => data);
+  }
+
+  const taskNames = Object.keys(tasks);
+  for (const taskName of taskNames) {
+    if (typeof tasks[taskName] === 'function') {
+      tasks[taskName] = [tasks[taskName]];
+    }
+    for (const depTaskName of tasks[taskName]) {
+      if (typeof depTaskName === 'string' && !taskNames.includes(depTaskName)) {
+        throw new Error(
+          `The task ${taskName} is depends upon a task named ${depTaskName}, ` +
+          `but ${depTaskName} does not exist`
+        );
+      }
+    }
+  }
+
+  return executeNextTasks();
 };
 
 
