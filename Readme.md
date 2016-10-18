@@ -187,6 +187,19 @@ relign.parallelConcat(items, worker) -> promise(results)
 relign.seriesConcat(items, worker) -> promise(results)
 ```
 
+#### Parallel Find
+
+```javascript
+relign.parallelFind(items, tester) -> promise(item)
+```
+
+
+#### Series Find
+
+```javascript
+relign.seriesFind(items, tester) -> promise(item)
+```
+
 
 ### Utilities
 
