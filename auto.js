@@ -3,7 +3,7 @@ const parallel = require('./parallel');
 
 
 const auto = (tasks) => {
-  const results = typeof tasks.length === 'number' ? [] : {};
+  const results = {};
 
   const executeNextTasks = (lastTaskName) => {
     const nextTaskNames = Object.keys(tasks)
