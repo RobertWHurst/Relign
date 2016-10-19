@@ -8,31 +8,48 @@ class TimeoutPromise extends Promise {
       duration = fn;
       fn       = undefined;
     }
-    let _resolve, _timeoutId;
+    let timeoutData = null;
     super((resolve, reject) => {
-      _resolve = resolve;
+      timeoutData = { resolve, reject, fn, duration };
       if (typeof duration === 'number') {
-        _timeoutId = global.setTimeout(() => {
+        timeoutData.timeoutId = global.setTimeout(() => {
           exec(fn).then(resolve).catch(reject);
         }, duration);
       } else {
         fn(resolve, reject);
       }
     });
-    this._timeoutId = _timeoutId;
-    this._resolve   = _resolve;
+
+    this._parent      = null;
+    this._timeoutData = timeoutData;
+  }
+
+  get _timeoutData() {
+    return this._parent ? this._parent._timeoutData : this.__timeoutData;
+  }
+
+  set _timeoutData(timeoutData) {
+    this.__timeoutData = timeoutData;
   }
 
   then(fn) {
-    const promise      = super.then(fn);
-    promise._timeoutId = this._timeoutId;
-    promise._resolve   = this._resolve;
+    const promise   = super.then(fn);
+    promise._parent = this;
     return promise;
   }
 
   clear(val) {
-    clearTimeout(this._timeoutId);
-    this._resolve(val);
+    const timeoutData = this._timeoutData;
+    global.clearTimeout(timeoutData.timeoutId);
+    timeoutData.resolve(val);
+  }
+
+  reset() {
+    const timeoutData = this._timeoutData;
+    global.clearTimeout(timeoutData.timeoutId);
+    timeoutData.timeoutId = global.setTimeout(() => {
+      exec(timeoutData.fn).then(timeoutData.resolve).catch(timeoutData.reject);
+    }, timeoutData.duration);
   }
 }
 

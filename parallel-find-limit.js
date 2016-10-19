@@ -27,7 +27,7 @@ const parallelFindLimit = (items, tester, limit) => {
     firstProps.map((prop) =>
       testItemByProp(prop).then(handleTestResult(prop), reject));
   });
-}
+};
 
 
 module.exports = parallelFindLimit;

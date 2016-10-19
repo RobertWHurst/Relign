@@ -161,4 +161,36 @@ describe('new TimeoutPromise(fn, duration)', () => {
       });
     })
   });
+
+
+  describe('#reset() -> this', () => {
+
+    it('pospones the execution of the timeout fn', (done) => {
+      const clock = sinon.useFakeTimers();
+      const fn    = sinon.stub().returns('val');
+      const cb    = sinon.stub();
+
+      const timeoutPromise = setTimeout(fn, 10).then(cb);
+
+      clock.tick(5);
+
+      timeoutPromise.reset();
+
+      clock.tick(5);
+
+      sinon.assert.notCalled(fn);
+
+      clock.tick(5);
+
+      clock.restore();
+      global.setTimeout(() => {
+
+        sinon.assert.calledOnce(fn);
+        sinon.assert.calledOnce(cb);
+        sinon.assert.calledWith(cb, 'val');
+
+        done();
+      });
+    })
+  });
 });
