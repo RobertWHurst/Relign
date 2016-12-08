@@ -2,25 +2,23 @@
 [![Coveralls](https://img.shields.io/coveralls/jekyll/jekyll.svg)](https://coveralls.io/github/RobertWHurst/relign)
 [![npm](https://img.shields.io/npm/v/relign.svg)](https://www.npmjs.com/package/relign)
 
-# Relign
+# Intro to relign
 
-Relign is a control flow library for promises heavily inspired by
-[async](https://github.com/caolan/async). Async is one of the most loved
-libraries on NPM, and there are very good reasons to feel this way. Async
-provides a lot of very powerful functions for taking unruly asynchronous code
-and making it both readable and reasonable. Async does this with the classic
-error first call back pattern popular in node. Relign attempts to achieve the
-a similar set of goals to async, but for promises.
+relign is a highly functional control flow library. It's heavily inspired by [async](https://github.com/caolan/async) but goes a bit further. relign treats all functions as values, and thus wherever you can pass a function to relign, it's also fine to pass a value. relign refers to both functions, functions that return promises, promises, and any other value as tasks.
 
-## Installing Relign
+relign's utilities are greatly inspired by. Async is one of the most loved libraries on NPM, and there are many very good reasons for this. Async provides a lot of very powerful functions for taking unruly asynchronous code and making it both readable and reasonable. Async does this with the classic error first callback pattern popular in node. relign attempts to achieve a similar set of goals to async, but for promises. It provides a large collection of methods for processing collections of data, and controlling the execution of asynchronous code.
 
-Relign can be installed from NPM.
+If you're starting a new project and want a good foundation for your control flow patterns, or you're planning on moving a project from node style callbacks, to the newer 'async await' style of control flow, relign may be just what you need.
+
+## Installing relign
+
+relign can be installed from NPM.
 
 ```shell
 npm i relign --save
 ```
 
-To use relign simply require the function you need.
+To use relign you may simply require the function you need:
 
 ```javascript
 const parallel = require('relign/parallel');
@@ -34,7 +32,7 @@ parallel([
 ]).then(() => console.log('ready'));
 ```
 
-Or require the whole library.
+or require the whole library:
 
 ```javascript
 const relign = require('relign');
@@ -50,19 +48,19 @@ relign.parallel([
 
 ## Docs
 
+The following will cover the relign API and how to use it.
+
 ### Control Flow
 
 #### Auto
 
 ```javascript
-relign.auto(tasks) -> promise(results)
+relign.auto(autoTasks) -> promise(results)
 ```
 
-Auto provides a way to organize a set of interdependent tasks and execute them
-in the most efficient way possible. Biased on the the dependencies associated
-with each task, auto will figure out which tasks will run first, and start
-ones that depend upon tasks completed. Once all of the tasks are complete auto
-will resolve the results.
+Auto will execute tasks without dependencies first, as these dependencies resolve, any tasks dependent on them will be executed. The result is that a complex collection of dependencies can be resolved as fast as possible without complex control flow code.
+
+Auto executes an object containing arrays. These arrays each contain a task, proceeded by dependencies of the task, if any. Note that the dependencies are strings that match the key of another task within the given object. For reference see the example below. Tasks are any function or value that can be passed to [exec](#exec).
 
 ```javascript
 relign.auto({
@@ -81,10 +79,11 @@ relign.auto({
 relign.parallel(tasks) -> promise(results)
 ```
 
-Parallel accepts an array or object of tasks. It will then execute each of those
-tasks in within the same tick. Once all of the tasks resolve parallel will
-resolve the results. The results object will match the same structure as the
-tasks object or array.
+Parallel is a great way to concurrently execute a collection of tasks then wait for all of them to complete.
+
+Parallel accepts an array or object containing tasks. A task is a function or value accepted by [exec](#exec). Parallel will execute all of the tasks and return a promise. This promise will resolve once all of the tasks have resolved. The resolved results will be an array or object matching the keys/indexes of each task. Each task result will be present in the same key/index as the task that produced it.
+
+Below is two examples of how you might start a server and connect to a database concurrently. The first example uses a task object, and the second uses a task array. These examples are functionally equivalent.
 
 ```javascript
 relign.parallel({
@@ -106,10 +105,11 @@ relign.parallel([
 relign.parallelLimit(tasks, limit) -> promise(results)
 ```
 
-Parallel limit behaves almost identical to [parallel](#parallel), but will
-not execute more than a fixed limit of tasks at a time. Once a task resolves and
-there are additional tasks to execute, another task will be executed. Once all
-of the tasks have been resolved parallelLimit resolves the results.
+Similar to [parallel](#parallel), parallel limit is a great way to concurrently execute a collection of tasks, but with an added ability to limit the maximum task concurrency.
+
+Parallel limit accepts an array or object containing tasks, and a limit. A task is a function or value that can be accepted by [exec](#exec). The limit is the maximum number of tasks that can be executed simultaneously. Like parallel, parallel limit returns a promise that resolves once all of the tasks have resolved. The resolved results will be an array or object matching the keys/indexes of each task. Each task result will be present in the same key/index as the task that produced it.
+
+Below is two examples of how parallel limit might be used to load a collection of files into memory then parse their contents. Note that only two files can be loaded concurrency as instructed by the second argument passed to parallel limit.
 
 ```javascript
 relign.parallelLimit({
@@ -135,6 +135,10 @@ relign.parallelLimit([
 relign.series(tasks) -> promise(results)
 ```
 
+Series provides a way for executing tasks in order. If all of your tasks happen to be promise returning functions then you could do this with an async function, but relign tasks can be any value [exec](#exec) accepts. This makes relign series much more flexible.
+
+Series accepts an array or object of tasks. It will execute each of the tasks in the key/index order they are defined in. It returns a promise that will resolve once all of the tasks have resolved.
+
 #### Parallel Map
 
 ```javascript
@@ -142,10 +146,9 @@ relign.parallelMap(items, worker(item) -> promise(result)) -> promise(results)
 relign.parallelMap(items, worker(item) -> result) -> promise(results)
 ```
 
-Parallel map takes a array or object of items and executes an asynchronous
-worker upon each item at once. Once the worker has resolved a result for all
-of the items parallel map resolves the results. The results object will match
-the same structure as the items object or array.
+If you've needed to process data concurrently you know how hard it can be. Parallel map makes the job of concurrently processing data much easier.
+
+Parallel map accepts an array or object and a worker function. The worker function is executed once for each value within the array/object. The item is passed as the first argument of the worker function. The worker can return a promise, or a value. Parallel map returns a promise which once all of the worker has been executed upon all of the items, and any promises it returned have resolved the returned promise will resolve.
 
 ```javascript
 relign.parallelMap(resourceUrls, url => download(url))
@@ -156,12 +159,12 @@ relign.parallelMap(resourceUrls, url => download(url))
 #### Parallel Map Limit
 
 ```javascript
-relign.parallelMap(items, worker, limit) -> promise(results)
+relign.parallelMapLimit(items, worker(item) -> promise(result), limit) -> promise(results)
 ```
 
-Parallel Map Limit behaves nearly identically to [parallel map](#parallel-map)
-with the exception that it takes a limit and restricts the amount of items
-the worker can process at the same time by that limit.
+Parallel map limit is just like parallel map, but it limits the maximum concurrency. When working with larger data sets you want to limit your maximum concurrently. parallel map is great for working with smaller data sets, but for larger ones the sensible thing to do is limit the maximum concurrency.
+
+Parallel map limit accepts an array or object and a worker function. The worker function is executed once for each value within the array/object. The item is passed as the first argument of the worker function. The worker can return a promise, or a value. Parallel map limit returns a promise which once all of the worker has been executed upon all of the items, and any promises it returned have resolved the returned promise will resolve.
 
 ```javascript
 relign.parallelMap(resourceUrls, url => download(url), 6)
@@ -171,20 +174,22 @@ relign.parallelMap(resourceUrls, url => download(url), 6)
 #### Series Map
 
 ```javascript
-relign.series(items, worker) -> promise(results)
+relign.series(items, worker(item) -> promise(result)) -> promise(results)
 ```
+
+Series map takes a array or object of items and executes an asynchronous worker upon each item in series. Once the worker has resolved a result for all of the items parallel map resolves the results. The results object will match the same structure as the items object or array.
 
 #### Parallel Concat
 
 ```javascript
-relign.parallelConcat(items, worker) -> promise(results)
+relign.parallelConcat(items, worker(item) -> promise(result)) -> promise(results)
 ```
 
 
 #### Series Concat
 
 ```javascript
-relign.seriesConcat(items, worker) -> promise(results)
+relign.seriesConcat(items, worker(item) -> promise(result)) -> promise(results)
 ```
 
 #### Parallel Find
@@ -211,16 +216,7 @@ relign.exec(fn() => result) -> promise(result)
 relign.exec(value) -> promise(value)
 ```
 
-Exec is a utility for executing functions or wrapping values with a promise.
-It's used extensively by relign internally for normalizing arguments.
-
-If exec is given a function that returns a promise then exec will resolve the
-value resolved by that promise.
-
-If exec is given a function that returns a value then exec will resolve that
-value.
-
-If exec is given a value then it will resolve that value.
+Exec is used to convert any value to a promise. It's used extensively by relign internally for normalizing tasks. Exec makes relign a breeze to use because with it you can treat all functions as values. If given a function exec will execute it. Should the function return a promise then exec will return it. If the function instead returns a value, then relign will return a promise that resolves the value immediately. If exec is passed a promise, then it will return the promise. If exec is passed any other type of value other than a function, it will return a promise that resolves the value immediately.
 
 #### Next Tick
 
