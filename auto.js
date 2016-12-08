@@ -34,17 +34,37 @@ const auto = (tasks) => {
     return Promise.all(promises).then(() => results);
   }
 
+  const checkDep = (parentTaskName, taskName) => {
+    if (!tasks[taskName]) {
+      return Promise.reject(new Error(
+        `The task ${parentTaskName} is depends upon a task named ${taskName}, ` +
+        `but ${taskName} does not exist`
+      ));
+    }
+    for (const depTaskName of tasks[taskName]) {
+      if (typeof depTaskName === 'string') {
+        if (depTaskName === parentTaskName) {
+          return Promise.reject(new Error(
+            `${parentTaskName} has a circular dependency on ${taskName}`
+          ));
+        }
+        checkDep(parentTaskName, depTaskName);
+      }
+    }
+  };
+
   const taskNames = Object.keys(tasks);
   for (const taskName of taskNames) {
     if (typeof tasks[taskName] === 'function') {
       tasks[taskName] = [tasks[taskName]];
     }
+
     for (const depTaskName of tasks[taskName]) {
-      if (typeof depTaskName === 'string' && !taskNames.includes(depTaskName)) {
-        throw new Error(
-          `The task ${taskName} is depends upon a task named ${depTaskName}, ` +
-          `but ${depTaskName} does not exist`
-        );
+      if (typeof depTaskName === 'string') {
+        const rejectedPromise = checkDep(taskName, depTaskName);
+        if (rejectedPromise) {
+          return rejectedPromise;
+        }
       }
     }
   }

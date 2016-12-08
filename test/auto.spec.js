@@ -20,4 +20,12 @@ describe('auto(tasks) -> promise(results)', () => {
   it('can handle empty sets', () =>
     auto({}).then(d =>
       assert.deepEqual(d, {})));
+
+  it('throws error on circular dependencies', () =>
+    auto({
+      a: ['b', () => {}],
+      b: ['a', () => {}]
+    })
+      .then(v => { throw new Error('should have been rejected'); })
+      .catch(err => assert.ok(err)));
 });
