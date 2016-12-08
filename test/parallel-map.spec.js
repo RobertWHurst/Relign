@@ -16,4 +16,16 @@ describe('parallelMap(items, worker(item) -> promise(val)) -> promise(val)', () 
     return parallelMap(items, i => setTimeout(() => i + 1, 10)).then(d =>
       assert.deepEqual(d, { a: 2, b: 3, c: 4, d: 5 }));
   });
+
+  it('can handle empty items array', () => {
+    const items = [];
+    return parallelMap(items, i => i).then(r =>
+      assert.deepEqual(r, []));
+  });
+
+  it('can handle empty items object', () => {
+    const items = {};
+    return parallelMap(items, i => i).then(r =>
+      assert.deepEqual(r, {}));
+  });
 });

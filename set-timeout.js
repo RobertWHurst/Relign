@@ -32,8 +32,8 @@ class TimeoutPromise extends Promise {
     this.__timeoutData = timeoutData;
   }
 
-  then(fn) {
-    const promise   = super.then(fn);
+  then(resolve, reject) {
+    const promise   = super.then(resolve, reject);
     promise._parent = this;
     return promise;
   }
@@ -42,6 +42,7 @@ class TimeoutPromise extends Promise {
     const timeoutData = this._timeoutData;
     global.clearTimeout(timeoutData.timeoutId);
     timeoutData.resolve(val);
+    return this;
   }
 
   reset() {
@@ -50,6 +51,7 @@ class TimeoutPromise extends Promise {
     timeoutData.timeoutId = global.setTimeout(() => {
       exec(timeoutData.fn).then(timeoutData.resolve).catch(timeoutData.reject);
     }, timeoutData.duration);
+    return this;
   }
 }
 

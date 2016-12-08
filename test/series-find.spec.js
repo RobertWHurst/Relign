@@ -16,4 +16,16 @@ describe('seriesFind(items, worker(item) -> promise(val)) -> promise(val)', () =
     return seriesFind(items, i => setTimeout(() => i === 2, 10)).then(r =>
       assert.deepEqual(r, 2));
   });
+
+  it('can handle empty items array', () => {
+    const items = [];
+    return seriesFind(items, i => i).then(r =>
+      assert.deepEqual(r, undefined));
+  });
+
+  it('can handle empty items object', () => {
+    const items = {};
+    return seriesFind(items, i => i).then(r =>
+      assert.deepEqual(r, undefined));
+  });
 });

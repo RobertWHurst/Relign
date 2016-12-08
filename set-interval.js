@@ -22,8 +22,8 @@ class IntervalPromise extends Promise {
     this._resolve    = _resolve;
   }
 
-  then(fn) {
-    const promise       = super.then(fn);
+  then(resolve, reject) {
+    const promise       = super.then(resolve, reject);
     promise._intervalId = this._intervalId;
     promise._resolve    = this._resolve;
     return promise;
@@ -32,6 +32,7 @@ class IntervalPromise extends Promise {
   clear(val) {
     clearInterval(this._intervalId);
     this._resolve(val);
+    return this;
   }
 }
 

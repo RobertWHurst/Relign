@@ -148,7 +148,9 @@ relign.parallelMap(items, worker(item) -> result) -> promise(results)
 
 If you've needed to process data concurrently you know how hard it can be. Parallel map makes the job of concurrently processing data much easier.
 
-Parallel map accepts an array or object and a worker function. The worker function is executed once for each value within the array/object. The item is passed as the first argument of the worker function. The worker can return a promise, or a value. Parallel map returns a promise which once all of the worker has been executed upon all of the items, and any promises it returned have resolved the returned promise will resolve.
+Parallel map accepts an array or object and a worker function. The worker function is executed once for each value within the array/object. The item is passed as the first argument of the worker function. The worker can return a promise, or a value. Parallel map returns a promise which once the worker has been executed upon all of the items, and any promises it returned have resolved the returned promise will resolve.
+
+Below is an example of how you might take an array of resource urls, download each resource, then store the collection of resources.
 
 ```javascript
 relign.parallelMap(resourceUrls, url => download(url))
@@ -164,7 +166,9 @@ relign.parallelMapLimit(items, worker(item) -> promise(result), limit) -> promis
 
 Parallel map limit is just like parallel map, but it limits the maximum concurrency. When working with larger data sets you want to limit your maximum concurrently. parallel map is great for working with smaller data sets, but for larger ones the sensible thing to do is limit the maximum concurrency.
 
-Parallel map limit accepts an array or object and a worker function. The worker function is executed once for each value within the array/object. The item is passed as the first argument of the worker function. The worker can return a promise, or a value. Parallel map limit returns a promise which once all of the worker has been executed upon all of the items, and any promises it returned have resolved the returned promise will resolve.
+Parallel map limit accepts an array or object and a worker function. The worker function is executed once for each value within the array/object. The item is passed as the first argument of the worker function. The worker can return a promise, or a value. Parallel map limit returns a promise which once the worker has been executed upon all of the items, and any promises it returned have resolved the returned promise will resolve.
+
+Below is an example of how you might take an array of resource urls, download each resource, then store the collection of resources. In this example the number of resources that can be downloaded at once is six.
 
 ```javascript
 relign.parallelMap(resourceUrls, url => download(url), 6)
@@ -174,16 +178,19 @@ relign.parallelMap(resourceUrls, url => download(url), 6)
 #### Series Map
 
 ```javascript
-relign.series(items, worker(item) -> promise(result)) -> promise(results)
+relign.seriesMap(items, worker(item) -> promise(result)) -> promise(results)
 ```
 
-Series map takes a array or object of items and executes an asynchronous worker upon each item in series. Once the worker has resolved a result for all of the items parallel map resolves the results. The results object will match the same structure as the items object or array.
+In the event you have to process a data set serially with asynchronous logic then you probably need series map.
+
+Series map accepts an array or object and a worker function. The worker function is executed once for each value within the array/object. The item is passed as the first argument of the worker function. The worker can return a promise, or a value. Series map returns a promise which once the worker has been executed upon all of the items, and any promises it returned have resolved the returned promise will resolve.
 
 #### Parallel Concat
 
 ```javascript
 relign.parallelConcat(items, worker(item) -> promise(result)) -> promise(results)
 ```
+
 
 
 #### Series Concat

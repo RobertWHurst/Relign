@@ -16,4 +16,16 @@ describe('parallelConcat(items, worker(item) -> promise(val)) -> promise(val)', 
     return parallelConcat(items, i => setTimeout(() => [i - 1, i, i + 1], 10)).then(d =>
       assert.deepEqual(d, [0, 1, 2, 1, 2, 3, 2, 3, 4, 3, 4, 5]));
   });
+
+  it('can process an empty item array', () => {
+    const items = [];
+    return parallelConcat(items, i => i).then(d =>
+      assert.deepEqual(d, []));
+  });
+
+  it('can process an empty item object', () => {
+    const items = {};
+    return parallelConcat(items, i => i).then(d =>
+      assert.deepEqual(d, []));
+  });
 });

@@ -19,7 +19,15 @@ describe('series(tasks) -> promise(results)', () => {
       c: () => new Promise(r => setTimeout(r(3), 100))
     }).then(results => assert(results, { a: 1, b: 2, c: 3 })));
 
-  it('runs all the functions in series');
+  it('runs all the functions in series', () => {
+    let   count   = 0;
+    return series([
+      () => { count += 1; return nextTick(() => { count -= 1 }); },
+      () => { count += 1; return nextTick(() => { count -= 1 }); },
+      () => { count += 1; return nextTick(() => { count -= 1 }); },
+      () => { assert.equal(count, 0); }
+    ]).then(() => assert.equal(count, 0));
+  });
 
   it('captures a thrown error', () =>
     series({
@@ -27,4 +35,10 @@ describe('series(tasks) -> promise(results)', () => {
       b: () => 2,
       c: () => { throw new Error('error'); }
     }).catch(err => assert.equal(err.message, 'error')));
+
+  it('can handle an empty tasks array', () =>
+    series([]).then(r => assert.deepEqual(r, [])));
+
+  it('can handle an empty tasks object', () =>
+    series({}).then(r => assert.deepEqual(r, {})));
 });

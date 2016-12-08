@@ -16,4 +16,8 @@ describe('auto(tasks) -> promise(results)', () => {
       assert.deepEqual(execOrder, ['b', 'd', 'a', 'c' ]);
     });
   });
+
+  it('can handle empty sets', () =>
+    auto({}).then(d =>
+      assert.deepEqual(d, {})));
 });

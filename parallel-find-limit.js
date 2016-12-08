@@ -8,6 +8,8 @@ const parallelFindLimit = (items, tester, limit) => {
     const props      = Object.keys(items);
     const firstProps = props.splice(0, limit);
 
+    if (firstProps.length < 1) { return resolve(); }
+
     const testItemByProp = (prop) => exec(() => tester(items[prop]));
 
     const handleTestResult = (prop) => (ok) => {
