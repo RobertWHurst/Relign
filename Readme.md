@@ -185,18 +185,22 @@ In the event you have to process a data set serially with asynchronous logic the
 
 Series map accepts an array or object and a worker function. The worker function is executed once for each value within the array/object. The item is passed as the first argument of the worker function. The worker can return a promise, or a value. Series map returns a promise which once the worker has been executed upon all of the items, and any promises it returned have resolved the returned promise will resolve.
 
-#### Parallel Concat
+#### Parallel Filter
 
 ```javascript
-relign.parallelConcat(items, worker(item) -> promise(result)) -> promise(results)
+relign.parallelFilter(items, tester) -> promise(filteredItems)
 ```
 
-
-
-#### Series Concat
+#### Parallel Filter Limit
 
 ```javascript
-relign.seriesConcat(items, worker(item) -> promise(result)) -> promise(results)
+relign.parallelFilterLimit(items, tester) -> promise(filteredItems)
+```
+
+#### Series Filter
+
+```javascript
+relign.seriesFilter(items, tester) -> promise(filteredItems)
 ```
 
 #### Parallel Find
@@ -205,6 +209,11 @@ relign.seriesConcat(items, worker(item) -> promise(result)) -> promise(results)
 relign.parallelFind(items, tester) -> promise(item)
 ```
 
+#### Parallel Find Limit
+
+```javascript
+relign.parallelFindLimit(items, tester, limit) -> promise(item)
+```
 
 #### Series Find
 
@@ -212,6 +221,17 @@ relign.parallelFind(items, tester) -> promise(item)
 relign.seriesFind(items, tester) -> promise(item)
 ```
 
+#### Parallel Concat
+
+```javascript
+relign.parallelConcat(items, worker(item) -> promise(result)) -> promise(results)
+```
+
+#### Series Concat
+
+```javascript
+relign.seriesConcat(items, worker(item) -> promise(result)) -> promise(results)
+```
 
 ### Utilities
 

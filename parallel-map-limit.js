@@ -2,11 +2,11 @@ const parallelLimit = require('./parallel-limit');
 
 
 const parallelMapLimit = (items, fn, limit) => {
+  const tasks = typeof items === 'number' ? [] : {};
   for (const prop in items) {
-    const item = items[prop];
-    items[prop] = () => fn(item);
+    tasks[prop] = () => fn(items[prop]);
   }
-  return parallelLimit(items, limit);
+  return parallelLimit(tasks, limit);
 };
 
 

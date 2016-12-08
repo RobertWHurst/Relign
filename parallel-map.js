@@ -2,11 +2,11 @@ const parallel = require('./parallel');
 
 
 const parallelMap = (items, fn) => {
+  const tasks = typeof items === 'number' ? [] : {};
   for (const prop in items) {
-    const item = items[prop];
-    items[prop] = () => fn(item);
+    tasks[prop] = () => fn(items[prop]);
   }
-  return parallel(items);
+  return parallel(tasks);
 };
 
 
