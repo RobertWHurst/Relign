@@ -20,7 +20,7 @@ describe('parallel(tasks) -> promise(results)', () => {
     }).then(results => assert(results, { a: 1, b: 2, c: 3 })));
 
   it('runs all the functions in parallel', () => {
-    let   count   = 0;
+    let count = 0;
     return parallel([
       () => { count += 1; return nextTick(() => { count -= 1 }); },
       () => { count += 1; return nextTick(() => { count -= 1 }); },
@@ -41,4 +41,13 @@ describe('parallel(tasks) -> promise(results)', () => {
 
   it('can handle an empty tasks object', () =>
     parallel({}).then(r => assert.deepEqual(r, {})));
+
+  it('aborts early if a promise is rejected', () => {
+    let bDone = false;
+    parallel({ a: Promise.reject(1), b: () => nextTick(() => { bDone = true; }) })
+      .catch(err => {
+        assert.equal(err,   1);
+        assert.equal(bDone, false);
+      });
+  });
 });
