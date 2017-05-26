@@ -1,6 +1,6 @@
 {
   "name": "relign",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Relign is a control flow library for promises heavily inspired by async",
   "main": "index.js",
   "scripts": {
@@ -32,5 +32,10 @@
   "bugs": {
     "url": "https://github.com/RobertWHurst/relign/issues"
   },
-  "homepage": "https://github.com/RobertWHurst/relign#readme"
+  "homepage": "https://github.com/RobertWHurst/relign#readme",
+  "browserify": {
+    "transform": [
+      ["babelify", { "presets": ["env"] }]
+    ]
+  }
 }
