@@ -28,4 +28,12 @@ describe('parallelConcat(items, worker(item) -> promise(val)) -> promise(val)', 
     return parallelConcat(items, i => i).then(d =>
       assert.deepEqual(d, []));
   });
+
+  it('passes the itemIndex and items array as a second and third argument', () => {
+    const items = [0, 1, 2];
+    return parallelConcat(items, (item, index, _items) => {
+      assert.equal(item, index);
+      assert.equal(items, _items);
+    });
+  });
 });

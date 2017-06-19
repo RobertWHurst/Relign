@@ -28,4 +28,12 @@ describe('parallelFilterLimit(items, test(item) -> promise(val), limit) -> promi
     return parallelFilterLimit(items, i => i, 2).then(r =>
       assert.deepEqual(r, {}));
   });
+
+  it('passes the itemIndex and items array as a second and third argument', () => {
+    const items = [0, 1, 2];
+    return parallelFilterLimit(items, (item, index, _items) => {
+      assert.equal(item, index);
+      assert.equal(items, _items);
+    }, 2);
+  });
 });

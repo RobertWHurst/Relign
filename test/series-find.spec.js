@@ -28,4 +28,12 @@ describe('seriesFind(items, worker(item) -> promise(val)) -> promise(val)', () =
     return seriesFind(items, i => i).then(r =>
       assert.deepEqual(r, undefined));
   });
+
+  it('passes the itemIndex and items array as a second and third argument', () => {
+    const items = [0, 1, 2];
+    return seriesFind(items, (item, index, _items) => {
+      assert.equal(item, index);
+      assert.equal(items, _items);
+    });
+  });
 });

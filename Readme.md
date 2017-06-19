@@ -142,8 +142,8 @@ Series accepts an array or object of tasks. It will execute each of the tasks in
 #### Parallel Map
 
 ```javascript
-relign.parallelMap(items, worker(item) -> promise(result)) -> promise(results)
-relign.parallelMap(items, worker(item) -> result) -> promise(results)
+relign.parallelMap(items, worker(item, itemIndex, items) -> promise(result)) -> promise(results)
+relign.parallelMap(items, worker(item, itemIndex, items) -> result) -> promise(results)
 ```
 
 If you've needed to process data concurrently you know how hard it can be. Parallel map makes the job of concurrently processing data much easier.
@@ -161,7 +161,7 @@ relign.parallelMap(resourceUrls, url => download(url))
 #### Parallel Map Limit
 
 ```javascript
-relign.parallelMapLimit(items, worker(item) -> promise(result), limit) -> promise(results)
+relign.parallelMapLimit(items, worker(item, itemIndex, items) -> promise(result), limit) -> promise(results)
 ```
 
 Parallel map limit is just like parallel map, but it limits the maximum concurrency. When working with larger data sets you want to limit your maximum concurrently. parallel map is great for working with smaller data sets, but for larger ones the sensible thing to do is limit the maximum concurrency.
@@ -178,7 +178,7 @@ relign.parallelMap(resourceUrls, url => download(url), 6)
 #### Series Map
 
 ```javascript
-relign.seriesMap(items, worker(item) -> promise(result)) -> promise(results)
+relign.seriesMap(items, worker(item, itemIndex, items) -> promise(result)) -> promise(results)
 ```
 
 In the event you have to process a data set serially with asynchronous logic then you probably need series map.
@@ -188,49 +188,57 @@ Series map accepts an array or object and a worker function. The worker function
 #### Parallel Filter
 
 ```javascript
-relign.parallelFilter(items, tester) -> promise(filteredItems)
+relign.parallelFilter(items, tester(item, itemIndex, items) -> promise(isMatch)) -> promise(filteredItems)
+relign.parallelFilter(items, tester(item, itemIndex, items) -> isMatch) -> promise(filteredItems)
 ```
 
 #### Parallel Filter Limit
 
 ```javascript
-relign.parallelFilterLimit(items, tester) -> promise(filteredItems)
+relign.parallelFilterLimit(items, tester(item, itemIndex, items) -> promise(isMatch)) -> promise(filteredItems)
+relign.parallelFilterLimit(items, tester(item, itemIndex, items) -> isMatch) -> promise(filteredItems)
 ```
 
 #### Series Filter
 
 ```javascript
-relign.seriesFilter(items, tester) -> promise(filteredItems)
+relign.seriesFilter(items, tester(item, itemIndex, items) -> promise(isMatch)) -> promise(filteredItems)
+relign.seriesFilter(items, tester(item, itemIndex, items) -> isMatch) -> promise(filteredItems)
 ```
 
 #### Parallel Find
 
 ```javascript
-relign.parallelFind(items, tester) -> promise(item)
+relign.parallelFind(items, tester(item, itemIndex, items) -> promise(isMatch)) -> promise(item)
+relign.parallelFind(items, tester(item, itemIndex, items) -> isMatch) -> promise(item)
 ```
 
 #### Parallel Find Limit
 
 ```javascript
-relign.parallelFindLimit(items, tester, limit) -> promise(item)
+relign.parallelFindLimit(items, tester(item, itemIndex, items) -> promise(isMatch), limit) -> promise(item)
+relign.parallelFindLimit(items, tester(item, itemIndex, items) -> isMatch, limit) -> promise(item)
 ```
 
 #### Series Find
 
 ```javascript
-relign.seriesFind(items, tester) -> promise(item)
+relign.seriesFind(items, tester(item, itemIndex, items) -> promise(isMatch)) -> promise(item)
+relign.seriesFind(items, tester(item, itemIndex, items) -> isMatch) -> promise(item)
 ```
 
 #### Parallel Concat
 
 ```javascript
-relign.parallelConcat(items, worker(item) -> promise(result)) -> promise(results)
+relign.parallelConcat(items, worker(item, itemIndex, items) -> promise(result)) -> promise(results)
+relign.parallelConcat(items, worker(item, itemIndex, items) -> result) -> promise(results)
 ```
 
 #### Series Concat
 
 ```javascript
-relign.seriesConcat(items, worker(item) -> promise(result)) -> promise(results)
+relign.seriesConcat(items, worker(item, itemIndex, items) -> promise(result)) -> promise(results)
+relign.seriesConcat(items, worker(item, itemIndex, items) -> result) -> promise(results)
 ```
 
 ### Utilities

@@ -28,4 +28,12 @@ describe('parallelMapLimit(items, worker(item) -> promise(val)) -> promise(val)'
     return parallelMapLimit(items, i => i, 2).then(r =>
       assert.deepEqual(r, {}));
   });
+
+  it('passes the itemIndex and items array as a second and third argument', () => {
+    const items = [0, 1, 2];
+    return parallelMapLimit(items, (item, index, _items) => {
+      assert.equal(item, index);
+      assert.equal(items, _items);
+    }, 2);
+  });
 });

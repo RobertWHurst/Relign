@@ -7,7 +7,7 @@ const parallelFind = (items, tester) => {
     let resolved = false;
 
     const promises = Object.keys(items).map(p => {
-      return exec(() => tester(items[p])).then(ok => {
+      return exec(() => tester(items[p], p, items)).then(ok => {
         if (ok) {
           resolved = true;
           resolve(items[p]);

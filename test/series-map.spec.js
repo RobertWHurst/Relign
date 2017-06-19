@@ -28,4 +28,12 @@ describe('seriesMap(items, worker(item) -> promise(val)) -> promise(val)', () =>
     return seriesMap(items, i => i).then(r =>
       assert.deepEqual(r, {}));
   });
+
+  it('passes the itemIndex and items array as a second and third argument', () => {
+    const items = [0, 1, 2];
+    return seriesMap(items, (item, index, _items) => {
+      assert.equal(item, index);
+      assert.equal(items, _items);
+    });
+  });
 });

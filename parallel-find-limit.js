@@ -10,7 +10,7 @@ const parallelFindLimit = (items, tester, limit) => {
 
     if (firstProps.length < 1) { return resolve(); }
 
-    const testItemByProp = (prop) => exec(() => tester(items[prop]));
+    const testItemByProp = (prop) => exec(() => tester(items[prop], prop, items));
 
     const handleTestResult = (prop) => (ok) => {
       if (resolved) { return; }
