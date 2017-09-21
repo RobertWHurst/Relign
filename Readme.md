@@ -28,8 +28,8 @@ const server   = require('./server');
 const database = require('./database');
 
 parallel([
-  () => server.listen(),
-  () => database.connect()
+  server.listen(),
+  database.connect()
 ]).then(() => console.log('ready'));
 ```
 
@@ -42,8 +42,8 @@ const server   = require('./server');
 const database = require('./database');
 
 relign.parallel([
-  () => server.listen(),
-  () => database.connect()
+  server.listen(),
+  database.connect()
 ]).then(() => console.log('ready'));
 ```
 
@@ -65,11 +65,11 @@ Auto executes an object containing arrays. These arrays each contain a task, pro
 
 ```javascript
 relign.auto({
-  mixingBowl: [() => getMixingBowl()],
+  mixingBowl: [getMixingBowl()],
   cakeMix   : ['mixingBowl', r => addCakeMix(r.mixingBowl)],
   milk      : ['mixingBowl', r => addMilk(r.mixingBowl)],
   mix       : ['cakeMix', 'milk', r => mixContents(r.mixingBowl)],
-  hotOven   : [() => preheatOven()],
+  hotOven   : [preheatOven()],
   cake      : ['mix', 'hotOven', r => r.hotOven.bakeContents(r.mixingBowl)],
 }).then(results => eat(results.cake));
 ```
@@ -88,8 +88,8 @@ Below is two examples of how you might start a server and connect to a database 
 
 ```javascript
 relign.parallel({
-  server  : () => server.listen(),
-  database: () => database.connect()
+  server  : server.listen(),
+  database: database.connect()
 }).then(results => console.log(`Server listening on port ${results.server.port}`));
 ```
 
@@ -114,19 +114,19 @@ Below is two examples of how parallel limit might be used to load a collection o
 
 ```javascript
 relign.parallelLimit({
-  fileOne  : () => loadFileOne(),
-  fileTwo  : () => loadFileTwo(),
-  fileThree: () => loadFileThree(),
-  fileFour : () => loadFileFour()
+  fileOne  : loadFileOne(),
+  fileTwo  : loadFileTwo(),
+  fileThree: loadFileThree(),
+  fileFour : loadFileFour()
 }, 2).then(files => parse(files));
 ```
 
 ```javascript
 relign.parallelLimit([
-  () => loadFileOne(),
-  () => loadFileTwo(),
-  () => loadFileThree(),
-  () => loadFileFour()
+  loadFileOne(),
+  loadFileTwo(),
+  loadFileThree(),
+  loadFileFour()
 ], 2).then(files => parse(files));
 ```
 
