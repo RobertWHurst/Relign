@@ -85,7 +85,8 @@ a {
 
 @media screen and (max-width: 42em) {
   .project-name {
-    font-size: 1.75rem; } }
+    font-size: 1.75rem;
+    font-family: 'Prosto One', cursive; } }
 
 .project-tagline {
   margin-bottom: 2rem;
