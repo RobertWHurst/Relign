@@ -158,7 +158,6 @@ relign.parallelMap(resourceUrls, url => download(url))
   .then(resources => store(resources));
 ```
 
-
 #### Parallel Map Limit
 
 ```javascript
@@ -186,6 +185,18 @@ In the event you have to process a data set serially with asynchronous logic the
 
 Series map accepts an array or object and a worker function. The worker function is executed once for each value within the array/object. The item is passed as the first argument of the worker function. The worker can return a promise, or a value. Series map returns a promise which once the worker has been executed upon all of the items, and any promises it returned have resolved the returned promise will resolve.
 
+#### Parallel Flat Map
+
+```javascript
+relign.parallelFlatMap(items, worker(item, itemIndex, items) -> promise(results)) -> promise(results)
+```
+
+#### Series Flat Map
+
+```javascript
+relign.seriesFlatMap(items, worker(item, itemIndex, items) -> promise(results)) -> promise(results)
+```
+
 #### Parallel Filter
 
 ```javascript
@@ -205,6 +216,12 @@ relign.parallelFilterLimit(items, tester(item, itemIndex, items) -> isMatch) -> 
 ```javascript
 relign.seriesFilter(items, tester(item, itemIndex, items) -> promise(isMatch)) -> promise(filteredItems)
 relign.seriesFilter(items, tester(item, itemIndex, items) -> isMatch) -> promise(filteredItems)
+```
+
+#### Series Reduce
+
+```javascript
+relign.seriesReduce(items, worker(val, item, itemIndex, items) -> promise(val), val) -> promise(result)
 ```
 
 #### Parallel Find

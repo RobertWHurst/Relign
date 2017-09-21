@@ -1,7 +1,7 @@
 const exec = require('./exec');
 
 
-const reduce = (items, fn, result) => {
+const seriesReduce = (items, fn, result) => {
   const props = Object.keys(items);
 
   const tasks = typeof items.length === 'number' ? [] : {};
@@ -21,4 +21,4 @@ const reduce = (items, fn, result) => {
 };
 
 
-module.exports = reduce;
+module.exports = seriesReduce;
