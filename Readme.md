@@ -5,7 +5,7 @@
 
 # Intro to relign
 
-relign is a highly functional control flow library. It's heavily inspired by [async](https://github.com/caolan/async) but goes a bit further. relign treats all functions as values, and thus wherever you can pass a function to relign, it's also fine to pass a value. relign refers to both functions, functions that return promises, promises, and any other value as tasks.
+relign is a promise based control flow library heavily inspired by [async](https://github.com/caolan/async), but goes a bit further. relign treats all functions as values, and thus wherever you can pass a function to relign, it's also fine to pass a value. relign refers to both functions, functions that return promises, promises, and any other value as tasks.
 
 relign's utilities are greatly inspired by [async](https://github.com/caolan/async). async is one of the most loved libraries on NPM, and there are many very good reasons for this. Async provides a lot of very powerful functions for taking unruly asynchronous code and making it both readable and reasonable. Async does this with the classic error first callback pattern popular in node. relign attempts to achieve a similar set of goals to async, but for promises. It provides a large collection of methods for processing collections of data, and controlling the execution of asynchronous code.
 
