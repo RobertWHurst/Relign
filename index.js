@@ -17,6 +17,7 @@ exports.parallel            = require('./parallel');
 exports.seriesConcat        = require('./series-concat');
 exports.seriesFilter        = require('./series-filter');
 exports.seriesFind          = require('./series-find');
+exports.seriesFlatMap       = require('./series-find');
 exports.seriesMap           = require('./series-map');
 exports.series              = require('./series');
 exports.setInterval         = require('./set-interval');
