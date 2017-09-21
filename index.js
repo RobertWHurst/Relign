@@ -9,6 +9,7 @@ exports.parallelFilterLimit = require('./parallel-filter-limit');
 exports.parallelFilter      = require('./parallel-filter');
 exports.parallelFindLimit   = require('./parallel-find-limit');
 exports.parallelFind        = require('./parallel-find');
+exports.parallelFlatMap     = require('./parallel-flat-map');
 exports.parallelLimit       = require('./parallel-limit');
 exports.parallelMapLimit    = require('./parallel-map-limit');
 exports.parallelMap         = require('./parallel-map');
