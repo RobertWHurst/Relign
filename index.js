@@ -14,6 +14,7 @@ exports.parallelLimit       = require('./parallel-limit');
 exports.parallelMapLimit    = require('./parallel-map-limit');
 exports.parallelMap         = require('./parallel-map');
 exports.parallel            = require('./parallel');
+exports.reduce              = require('./reduce');
 exports.seriesConcat        = require('./series-concat');
 exports.seriesFilter        = require('./series-filter');
 exports.seriesFind          = require('./series-find');

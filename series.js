@@ -8,7 +8,7 @@ const series = (tasks) => {
   const rec = () => {
     const prop = props.shift();
     const fn   = tasks[prop];
-    return fn ?
+    return prop !== undefined ?
       exec(fn).then(v => { results[prop] = v; }).then(rec) :
       Promise.resolve(results);
   };
