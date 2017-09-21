@@ -47,8 +47,8 @@
 <span class="pl-k">const</span> <span class="pl-c1">database</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>./database<span class="pl-pds">'</span></span>);
 
 <span class="pl-en">parallel</span>([
-  () <span class="pl-k">=&gt;</span> <span class="pl-smi">server</span>.<span class="pl-en">listen</span>(),
-  () <span class="pl-k">=&gt;</span> <span class="pl-smi">database</span>.<span class="pl-en">connect</span>()
+  <span class="pl-smi">server</span>.<span class="pl-en">listen</span>(),
+  <span class="pl-smi">database</span>.<span class="pl-en">connect</span>()
 ]).<span class="pl-en">then</span>(() <span class="pl-k">=&gt;</span> <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>ready<span class="pl-pds">'</span></span>));</pre></div>
 
 <p>or require the whole library:</p>
@@ -59,8 +59,8 @@
 <span class="pl-k">const</span> <span class="pl-c1">database</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>./database<span class="pl-pds">'</span></span>);
 
 <span class="pl-smi">relign</span>.<span class="pl-en">parallel</span>([
-  () <span class="pl-k">=&gt;</span> <span class="pl-smi">server</span>.<span class="pl-en">listen</span>(),
-  () <span class="pl-k">=&gt;</span> <span class="pl-smi">database</span>.<span class="pl-en">connect</span>()
+  <span class="pl-smi">server</span>.<span class="pl-en">listen</span>(),
+  <span class="pl-smi">database</span>.<span class="pl-en">connect</span>()
 ]).<span class="pl-en">then</span>(() <span class="pl-k">=&gt;</span> <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>ready<span class="pl-pds">'</span></span>));</pre></div>
 
 <h2>
@@ -81,11 +81,11 @@
 <p>Auto executes an object containing arrays. These arrays each contain a task, proceeded by dependencies of the task, if any. Note that the dependencies are strings that match the key of another task within the given object. For reference see the example below. Tasks are any function or value that can be passed to <a href="#exec">exec</a>.</p>
 
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">relign</span>.<span class="pl-en">auto</span>({
-  mixingBowl<span class="pl-k">:</span> [() <span class="pl-k">=&gt;</span> <span class="pl-en">getMixingBowl</span>()],
+  mixingBowl<span class="pl-k">:</span> [<span class="pl-en">getMixingBowl</span>()],
   cakeMix   <span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">'</span>mixingBowl<span class="pl-pds">'</span></span>, <span class="pl-smi">r</span> <span class="pl-k">=&gt;</span> <span class="pl-en">addCakeMix</span>(<span class="pl-smi">r</span>.<span class="pl-smi">mixingBowl</span>)],
   milk      <span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">'</span>mixingBowl<span class="pl-pds">'</span></span>, <span class="pl-smi">r</span> <span class="pl-k">=&gt;</span> <span class="pl-en">addMilk</span>(<span class="pl-smi">r</span>.<span class="pl-smi">mixingBowl</span>)],
   mix       <span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">'</span>cakeMix<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>milk<span class="pl-pds">'</span></span>, <span class="pl-smi">r</span> <span class="pl-k">=&gt;</span> <span class="pl-en">mixContents</span>(<span class="pl-smi">r</span>.<span class="pl-smi">mixingBowl</span>)],
-  hotOven   <span class="pl-k">:</span> [() <span class="pl-k">=&gt;</span> <span class="pl-en">preheatOven</span>()],
+  hotOven   <span class="pl-k">:</span> [<span class="pl-en">preheatOven</span>()],
   cake      <span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">'</span>mix<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hotOven<span class="pl-pds">'</span></span>, <span class="pl-smi">r</span> <span class="pl-k">=&gt;</span> <span class="pl-smi">r</span>.<span class="pl-smi">hotOven</span>.<span class="pl-en">bakeContents</span>(<span class="pl-smi">r</span>.<span class="pl-smi">mixingBowl</span>)],
 }).<span class="pl-en">then</span>(<span class="pl-smi">results</span> <span class="pl-k">=&gt;</span> <span class="pl-en">eat</span>(<span class="pl-smi">results</span>.<span class="pl-smi">cake</span>));</pre></div>
 
@@ -101,8 +101,8 @@
 <p>Below is two examples of how you might start a server and connect to a database concurrently. The first example uses a task object, and the second uses a task array. These examples are functionally equivalent.</p>
 
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">relign</span>.<span class="pl-en">parallel</span>({
-  <span class="pl-en">server</span>  <span class="pl-k">:</span> () <span class="pl-k">=&gt;</span> <span class="pl-smi">server</span>.<span class="pl-en">listen</span>(),
-  <span class="pl-en">database</span><span class="pl-k">:</span> () <span class="pl-k">=&gt;</span> <span class="pl-smi">database</span>.<span class="pl-en">connect</span>()
+  <span class="pl-en">server</span>  <span class="pl-k">:</span> <span class="pl-smi">server</span>.<span class="pl-en">listen</span>(),
+  <span class="pl-en">database</span><span class="pl-k">:</span> <span class="pl-smi">database</span>.<span class="pl-en">connect</span>()
 }).<span class="pl-en">then</span>(<span class="pl-smi">results</span> <span class="pl-k">=&gt;</span> <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>Server listening on port <span class="pl-s1"><span class="pl-pse">${</span><span class="pl-smi">results</span>.<span class="pl-smi">server</span>.<span class="pl-c1">port</span><span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>));</pre></div>
 
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">relign</span>.<span class="pl-en">parallel</span>([
@@ -122,17 +122,17 @@
 <p>Below is two examples of how parallel limit might be used to load a collection of files into memory then parse their contents. Note that only two files can be loaded concurrency as instructed by the second argument passed to parallel limit.</p>
 
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">relign</span>.<span class="pl-en">parallelLimit</span>({
-  <span class="pl-en">fileOne</span>  <span class="pl-k">:</span> () <span class="pl-k">=&gt;</span> <span class="pl-en">loadFileOne</span>(),
-  <span class="pl-en">fileTwo</span>  <span class="pl-k">:</span> () <span class="pl-k">=&gt;</span> <span class="pl-en">loadFileTwo</span>(),
-  <span class="pl-en">fileThree</span><span class="pl-k">:</span> () <span class="pl-k">=&gt;</span> <span class="pl-en">loadFileThree</span>(),
-  <span class="pl-en">fileFour</span> <span class="pl-k">:</span> () <span class="pl-k">=&gt;</span> <span class="pl-en">loadFileFour</span>()
+  <span class="pl-en">fileOne</span>  <span class="pl-k">:</span> <span class="pl-en">loadFileOne</span>(),
+  <span class="pl-en">fileTwo</span>  <span class="pl-k">:</span> <span class="pl-en">loadFileTwo</span>(),
+  <span class="pl-en">fileThree</span><span class="pl-k">:</span> <span class="pl-en">loadFileThree</span>(),
+  <span class="pl-en">fileFour</span> <span class="pl-k">:</span> <span class="pl-en">loadFileFour</span>()
 }, <span class="pl-c1">2</span>).<span class="pl-en">then</span>(<span class="pl-smi">files</span> <span class="pl-k">=&gt;</span> <span class="pl-en">parse</span>(files));</pre></div>
 
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">relign</span>.<span class="pl-en">parallelLimit</span>([
-  () <span class="pl-k">=&gt;</span> <span class="pl-en">loadFileOne</span>(),
-  () <span class="pl-k">=&gt;</span> <span class="pl-en">loadFileTwo</span>(),
-  () <span class="pl-k">=&gt;</span> <span class="pl-en">loadFileThree</span>(),
-  () <span class="pl-k">=&gt;</span> <span class="pl-en">loadFileFour</span>()
+  <span class="pl-en">loadFileOne</span>(),
+  <span class="pl-en">loadFileTwo</span>(),
+  <span class="pl-en">loadFileThree</span>(),
+  <span class="pl-en">loadFileFour</span>()
 ], <span class="pl-c1">2</span>).<span class="pl-en">then</span>(<span class="pl-smi">files</span> <span class="pl-k">=&gt;</span> <span class="pl-en">parse</span>(files));</pre></div>
 
 <h4>
