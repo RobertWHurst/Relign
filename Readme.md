@@ -265,6 +265,8 @@ relign.seriesConcat(items, worker(item, itemIndex, items) -> result) -> promise(
 
 ```javascript
 relign.exec(fn() => promise(result)) -> promise(result)
+relign.exec(fn(cb(err, result))) -> promise(result)
+relign.exec(*gen() => promise(result)) -> promise([results])
 relign.exec(fn() => result) -> promise(result)
 relign.exec(value) -> promise(value)
 ```
