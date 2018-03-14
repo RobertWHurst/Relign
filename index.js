@@ -1,5 +1,6 @@
 
 exports.auto                = require('./auto');
+exports.cbToPromise         = require('./cb-to-promise');
 exports.exec                = require('./exec');
 exports.nextTick            = require('./next-tick');
 exports.parallelConcatLimit = require('./parallel-concat-limit');

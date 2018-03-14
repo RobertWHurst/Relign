@@ -74,6 +74,27 @@ relign.auto({
 }).then(results => eat(results.cake));
 ```
 
+#### CB to Promise
+
+```javascript
+relign.cbToPromise(cbFn) -> pFn
+```
+
+CB to Promise takes any function that expects a callback as it's final argument, and return a new function that will execute the original, but return a promise instead of executing a callback. Any arguments passed to this new fuction will be passed to the original. If the original function calls back with an error (or value of any kind) passed as the first argument of the callback, the promise will reject with the given error. If the original function calls back with a value, then that value will be resolved. If multiple values are passed to the callback, they will be collected into an array and resolved together. If CB to Promise is provided a non-function or a function with no expected arguments, then whatever it is passed will simply be returned.
+
+```javascript
+const connectToRemote = (url, cb) => {
+  // ...
+  cb(null, conn, stats);
+};
+
+const pConnectToRemote = relign.cbToPromise(connectToRemote);
+
+pConnectToRemote('http://db.mycoolsas.io').then(([conn, stats]) => {
+  // ...
+})
+```
+
 #### Parallel
 
 ```javascript
