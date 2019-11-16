@@ -1,0 +1,37 @@
+name: Lint & Test
+
+on:
+  push:
+    branches: master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Check Linting and Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.3.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 8.6
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Run Linter
+        run: pnpm lint
+
+      - name: Build Source
+        run: pnpm build
+
+      - name: Run Tests
+        run: pnpm test

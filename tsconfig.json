@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "alwaysStrict": true,
+    "moduleResolution": "node",
+    "lib": ["ESNext"],
+    "target": "ES2017",
+    "outDir": "./"
+  },
+  "include": ["./src/*"],
+  "exclude": ["./node_modules"]
+}
