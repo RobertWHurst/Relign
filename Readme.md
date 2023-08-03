@@ -1,3 +1,7 @@
+<h1 align="center">
+  <img alt="Relign" title="Relign" src="https://github.com/RobertWHurst/relign/assets/178857/4df2a8cc-9873-49b2-b3cc-a4faa7166ff2">
+</h1>
+
 <p align="center">
   <a href="https://www.npmjs.com/package/relign">
     <img src="https://img.shields.io/npm/v/relign">
