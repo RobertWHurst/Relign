@@ -73,15 +73,10 @@ that value will be returned as is.
 
 ## Function Index
 
-__Tasks Functions__
-
 - [parallel](#parallel)
 - [parallelLimit](#parallel-limit)
 - [series](#series)
 - [auto](#auto)
-
-__Items__
-
 - [parallelMap](#parallel-map)
 - [parallelMapLimit](#parallel-map-limit)
 - [seriesMap](#series-map)
@@ -95,15 +90,9 @@ __Items__
 - [parallelFlatMapLimit](#parallel-flat-map-limit)
 - [seriesFlatMap](#series-flat-map)
 - [seriesReduce](#series-reduce)
-
-__Timing__
-
 - [nextTick](#next-tick)
 - [setTimeout](#set-timeout)
 - [setInterval](#set-interval)
-
-__Promises__
-
 - [cbToPromise](#callback-to-promise)
 - [exec](#execute)
 
