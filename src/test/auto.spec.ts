@@ -4,7 +4,7 @@ import { auto } from '../auto'
 describe('auto(tasks) -> promise(results)', () => {
   it('executes the tasks in the correct order then resolves the results', async () => {
     const execOrder: string[] = []
-    const d = await auto({
+    const result = await auto({
       a: [
         'd',
         () => {
@@ -39,8 +39,8 @@ describe('auto(tasks) -> promise(results)', () => {
       b: number
       c: number
       d: number
-    }>(d)
-    expect(d).toEqual({ b: 1, d: 2, a: 3, c: 4 })
+    }>(result)
+    expect(result).toEqual({ b: 1, d: 2, a: 3, c: 4 })
     expect(execOrder).toEqual(['b', 'd', 'a', 'c'])
   })
 

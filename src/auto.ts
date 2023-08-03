@@ -1,6 +1,8 @@
 import { exec, Exec } from './exec'
 
-export type AutoTasks = { [key: string]: [...string[], () => any] }
+export type AutoTasks = {
+  [key: string]: [...string[], (tasks?: AutoTaskValues<any>) => any]
+}
 export type AutoTaskFn<T extends any[]> = T extends [...string[], infer F]
   ? F
   : never
@@ -11,7 +13,7 @@ export type AutoTaskValues<T extends AutoTasks> = {
 
 type TaskMeta = {
   dependencies: Set<string>
-  fn: () => any
+  fn: (tasks?: AutoTaskValues<any>) => any
 }
 
 export async function auto<T extends AutoTasks>(tasks: T) {
@@ -47,7 +49,10 @@ export async function auto<T extends AutoTasks>(tasks: T) {
       if (dependencies.size !== 0) continue
 
       tasksMap.delete(taskName)
-      results[taskName as keyof AutoTaskValues<T>] = await exec<any>(fn)
+      results[taskName as keyof AutoTaskValues<T>] = await exec<any>(() => {
+        if (typeof fn === 'function') return fn(results)
+        return fn
+      })
       hasExecutedTask = true
 
       for (const task of tasksMap.values()) {

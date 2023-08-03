@@ -70,7 +70,7 @@ export class IntervalPromise<V> implements Promise<V> {
 }
 
 export function setInterval<V>(
-  fn: () => void,
+  fn: (resolve: (value?: V | PromiseLike<V> | undefined) => void) => void,
   duration: number,
 ): IntervalPromise<V> {
   let intervalData: IntervalData
@@ -80,7 +80,7 @@ export function setInterval<V>(
     let intervalId: NodeJS.Timeout
     const intervalHandler = () => {
       try {
-        fn.call(intervalPromise)
+        fn.call(intervalPromise, resolve)
       } catch (err) {
         clearInterval(intervalId)
         reject(err)
