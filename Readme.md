@@ -1,325 +1,864 @@
-[![Travis](https://img.shields.io/travis/RobertWHurst/relign.svg)](https://travis-ci.org/RobertWHurst/relign)
-[![Coveralls](https://img.shields.io/coveralls/RobertWHurst/relign.svg)](https://coveralls.io/github/RobertWHurst/relign)
-[![npm](https://img.shields.io/npm/v/relign.svg)](https://www.npmjs.com/package/relign)
+<p align="center">
+  <a href="https://www.npmjs.com/package/relign">
+    <img src="https://img.shields.io/npm/v/relign">
+  </a>
+  <a href="https://www.npmjs.com/package/relign">
+    <img src="https://img.shields.io/npm/dm/relign">
+  </a>
+  <a href="https://github.com/RobertWHurst/Keystrokes/actions/workflows/ci.yml">
+    <img src="https://github.com/RobertWHurst/Keystrokes/actions/workflows/ci.yml/badge.svg">
+  </a>
+  <a href="https://github.com/sponsors/RobertWHurst">
+    <img src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86">
+  </a>
+  <a href="https://openbase.com/js/relign?utm_source=embedded&amp;utm_medium=badge&amp;utm_campaign=rate-badge">
+    <img src="https://badges.openbase.com/js/featured/relign.svg?token=2wanGBvFibIfrdpnvnSioqIgoC7lJt3ztNNcKsRw+Pg=">
+  </a>
+</p>
 
+__If you encounter a bug please [report it][bug-report].__
 
-# Intro to relign
+Relign is a little utility library for processing data and tasks in concurrent
+or serial patterns. It's heavily inspired by the wonderful library [async][async]
+which was widly used back in the bad old days of callback patterns popular in
+node programs at the time. Relign is for modern TypeScript and JavaScript programs
+that use async functions and promises.
 
-relign is a promise based control flow library heavily inspired by [async](https://github.com/caolan/async), but goes a bit further. relign treats all functions as values, and thus wherever you can pass a function to relign, it's also fine to pass a value. relign refers to both functions, functions that return promises, promises, and any other value as tasks.
+Relign is a collection of functions that take tasks or data and process them in
+various ways. These functions are all designed to be simple and easy to use
+without confusion.
 
-relign's utilities are greatly inspired by [async](https://github.com/caolan/async). async is one of the most loved libraries on NPM, and there are many very good reasons for this. Async provides a lot of very powerful functions for taking unruly asynchronous code and making it both readable and reasonable. Async does this with the classic error first callback pattern popular in node. relign attempts to achieve a similar set of goals to async, but for promises. It provides a large collection of methods for processing collections of data, and controlling the execution of asynchronous code.
+## Installation
 
-If you're starting a new project and want a good foundation for your control flow patterns, or you're planning on moving a project from node style callbacks, to the newer 'async await' style of control flow, relign may be just what you need.
-
-## Installing relign
-
-relign can be installed from NPM.
+Relign is published on [NPM][npm]. It can be used in any TypeScript or JavaScript
+project, and is esm or cjs compatible.
 
 ```shell
-npm i relign --save
+npm i relign
 ```
 
-To use relign you may simply require the function you need:
+```ts
+import { parallelMapLimit } from 'relign';
 
-```javascript
-const parallel = require('relign/parallel');
+const urlsToFetch: string[] = [
+  'https://coolsite.com/path/one',
+  'https://coolsite.com/path/two',
+  'https://coolsite.com/path/three',
+  //...
+  'https://coolsite.com/path/oneThousand',
+]
 
-const server   = require('./server');
-const database = require('./database');
-
-parallel([
-  server.listen(),
-  database.connect()
-]).then(() => console.log('ready'));
+const resultJson = await parallelMapLimit(urlsToFetch, async url => {
+  const response = await fetch(url);
+  return response.json();
+}, 10);
 ```
 
-or require the whole library:
+## A Note on Execution
 
-```javascript
-const relign = require('relign');
+One of the main things that make relign special is how it handles data or tasks.
 
-const server   = require('./server');
-const database = require('./database');
+Relign will happily accept any value as a task. If the value is a function it
+will be executed. If the value is a promise it will be awaited. If the value is
+a function that returns a promise, the promise will be awaited. If the value is
+anything else it will be returned as is. This means that you can pass a mix of
+functions, promises, and values to any relign function accepting tasks and it
+will do the right thing.
 
-relign.parallel([
-  server.listen(),
-  database.connect()
-]).then(() => console.log('ready'));
+Item functions work in a similar way, but instead these
+functions take a worker function that is called for each item in the collection.
+This function is executed in the same way as tasks. That means if the worker
+returns a promise, the promise will be awaited. If the worker returns a value
+that value will be returned as is.
+
+## Function Index
+
+__Tasks Functions__
+
+- [parallel](#parallel)
+- [parallelLimit](#parallel-limit)
+- [series](#series)
+- [auto](#auto)
+
+__Items__
+
+- [parallelMap](#parallel-map)
+- [parallelMapLimit](#parallel-map-limit)
+- [seriesMap](#series-map)
+
+- [parallelFilter](#parallel-filter)
+- [parallelFilterLimit](#parallel-filter-limit)
+- [seriesFilter](#series-filter)
+
+- [parallelFind](#parallel-find)
+- [parallelFindLimit](#parallel-find-limit)
+- [seriesFind](#series-find)
+
+- [parallelFlatMap](#parallel-flat-map)
+- [parallelFlatMapLimit](#parallel-flat-map-limit)
+- [seriesFlatMap](#series-flat-map)
+
+- [seriesReduce](#series-reduce)
+
+__Timing__
+
+- [nextTick](#next-tick)
+- [setTimeout](#set-timeout)
+- [setInterval](#set-interval)
+
+__Promises__
+
+- [cbToPromise](#callback-to-promise)
+- [exec](#execute)
+
+## Parallel
+
+The `parallel` function takes a collection of tasks and executes them concurrently.
+It returns a promise that resolves to an array of the results of each task. It
+will happily accept an array or object of tasks. Tasks can be functions, promises,
+functions that return a promise, or any other value.
+
+__With an Array__
+
+```ts
+import { parallel } from 'relign';
+
+const results = await parallel([
+  1,
+  Promise.resolve(2),
+  async () => 3,
+  async () => Promise.resolve(4),
+])
+
+console.log(results); // [1, 2, 3, 4]
 ```
 
-## Docs
+__With an Object__
 
-The following will cover the relign API and how to use it.
+```ts
+import { parallel } from 'relign';
 
-### Control Flow
-
-#### Auto
-
-```javascript
-relign.auto(autoTasks) -> promise(results)
-```
-
-Auto will execute tasks without dependencies first, as these dependencies resolve, any tasks dependent on them will be executed. The result is that a complex collection of dependencies can be resolved as fast as possible without complex control flow code.
-
-Auto executes an object containing arrays. These arrays each contain a task, proceeded by dependencies of the task, if any. Note that the dependencies are strings that match the key of another task within the given object. For reference see the example below. Tasks are any function or value that can be passed to [exec](#exec).
-
-```javascript
-relign.auto({
-  mixingBowl: [getMixingBowl()],
-  cakeMix   : ['mixingBowl', r => addCakeMix(r.mixingBowl)],
-  milk      : ['mixingBowl', r => addMilk(r.mixingBowl)],
-  mix       : ['cakeMix', 'milk', r => mixContents(r.mixingBowl)],
-  hotOven   : [preheatOven()],
-  cake      : ['mix', 'hotOven', r => r.hotOven.bakeContents(r.mixingBowl)],
-}).then(results => eat(results.cake));
-```
-
-#### CB to Promise
-
-```javascript
-relign.cbToPromise(cbFn) -> pFn
-```
-
-CB to Promise takes any function that expects a callback as it's final argument, and return a new function that will execute the original, but return a promise instead of executing a callback. Any arguments passed to this new fuction will be passed to the original. If the original function calls back with an error (or value of any kind) passed as the first argument of the callback, the promise will reject with the given error. If the original function calls back with a value, then that value will be resolved. If multiple values are passed to the callback, they will be collected into an array and resolved together. If CB to Promise is provided a non-function or a function with no expected arguments, then whatever it is passed will simply be returned.
-
-```javascript
-const connectToRemote = (url, cb) => {
-  // ...
-  cb(null, conn, stats);
-};
-
-const pConnectToRemote = relign.cbToPromise(connectToRemote);
-
-pConnectToRemote('http://db.mycoolsas.io').then(([conn, stats]) => {
-  // ...
+const results = await parallel({
+  one: 1,
+  two: Promise.resolve(2),
+  three: async () => 3,
+  four: async () => Promise.resolve(4),
 })
+
+console.log(results); // { one: 1, two: 2, three: 3, four: 4 }
 ```
 
-#### Parallel
+## Parallel Limit
 
-```javascript
-relign.parallel(tasks) -> promise(results)
+The `parallelLimit` function takes a collection of tasks and executes them
+concurrently with a limit on the number of tasks that can be executed at once.
+It returns a promise that resolves to an array of the results of each task. It
+will happily accept an array or object of tasks. Tasks can be functions, promises,
+functions that return a promise, or any other value.
+
+__With an Array__
+
+```ts
+import { parallelLimit } from 'relign';
+
+const results = await parallelLimit([
+  1,
+  Promise.resolve(2),
+  async () => 3,
+  async () => Promise.resolve(4),
+], 2)
+
+console.log(results); // [1, 2, 3, 4]
 ```
 
-Parallel is a great way to concurrently execute a collection of tasks then wait for all of them to complete.
+__With an Object__
 
-Parallel accepts an array or object containing tasks. A task is a function or value accepted by [exec](#exec). Parallel will execute all of the tasks and return a promise. This promise will resolve once all of the tasks have resolved. The resolved results will be an array or object matching the keys/indexes of each task. Each task result will be present in the same key/index as the task that produced it.
+```ts
+import { parallelLimit } from 'relign';
 
-Below is two examples of how you might start a server and connect to a database concurrently. The first example uses a task object, and the second uses a task array. These examples are functionally equivalent.
+const results = await parallelLimit({
+  one: 1,
+  two: Promise.resolve(2),
+  three: async () => 3,
+  four: async () => Promise.resolve(4),
+}, 2)
 
-```javascript
-relign.parallel({
-  server  : server.listen(),
-  database: database.connect()
-}).then(results => console.log(`Server listening on port ${results.server.port}`));
+console.log(results); // { one: 1, two: 2, three: 3, four: 4 }
 ```
 
-```javascript
-relign.parallel([
-  server.listen(),
-  database.connect()
-]).then(results => console.log(`Server listening on port ${results[0].port}`));
+## Series
+
+The `series` function takes a collection of tasks and executes them in series.
+It returns a promise that resolves to an array of the results of each task. It
+will happily accept an array or object of tasks. Tasks can be functions, promises,
+functions that return a promise, or any other value.
+
+__With an Array__
+
+```ts
+import { series } from 'relign';
+
+const results = await series([
+  1,
+  Promise.resolve(2),
+  async () => 3,
+  async () => Promise.resolve(4),
+])
+
+console.log(results); // [1, 2, 3, 4]
 ```
 
-#### Parallel Limit
+__With an Object__
 
-```javascript
-relign.parallelLimit(tasks, limit) -> promise(results)
+```ts
+import { series } from 'relign';
+
+const results = await series({
+  one: 1,
+  two: Promise.resolve(2),
+  three: async () => 3,
+  four: async () => Promise.resolve(4),
+})
+
+console.log(results); // { one: 1, two: 2, three: 3, four: 4 }
 ```
 
-Similar to [parallel](#parallel), parallel limit is a great way to concurrently execute a collection of tasks, but with an added ability to limit the maximum task concurrency.
+## Auto
 
-Parallel limit accepts an array or object containing tasks, and a limit. A task is a function or value that can be accepted by [exec](#exec). The limit is the maximum number of tasks that can be executed simultaneously. Like parallel, parallel limit returns a promise that resolves once all of the tasks have resolved. The resolved results will be an array or object matching the keys/indexes of each task. Each task result will be present in the same key/index as the task that produced it.
+The `auto` function is great when you want tasks to be executed in a specific
+order based on dependencies on one another, but still want to run non interdependent
+tasks concurrently. It takes an object with a key for each task and a array value
+of dependencies and a task. It returns a promise that resolves to an object with
+the results of each task. Tasks can be functions, promises, functions that return
+promises, or any other value.
 
-Below is two examples of how parallel limit might be used to load a collection of files into memory then parse their contents. Note that only two files can be loaded concurrency as instructed by the second argument passed to parallel limit.
+```ts
+import { auto } from 'relign';
 
-```javascript
-relign.parallelLimit({
-  fileOne  : loadFileOne(),
-  fileTwo  : loadFileTwo(),
-  fileThree: loadFileThree(),
-  fileFour : loadFileFour()
-}, 2).then(files => parse(files));
+const results = await auto({
+  one: [1],
+  two: [Promise.resolve(2)],
+  three: ['one', 'two', async ({ one, two }) => one + two],
+  four: ['two', async ({ two }) => two * 2],
+})
+
+console.log(results); // { one: 1, two: 2, three: 3, four: 4 }
 ```
 
-```javascript
-relign.parallelLimit([
-  loadFileOne(),
-  loadFileTwo(),
-  loadFileThree(),
-  loadFileFour()
-], 2).then(files => parse(files));
+## Parallel Map
+
+The `parallelMap` function takes a collection of items and a map function. It
+will then concurrently process each item in the collection with the map function.
+Note that the map function can return a promise or any other value. If a promise
+is returned, the result of the promise will be used as the value for the item in
+the results array. If any other value is returned, that value will be used as is.
+
+__With an Array__
+
+```ts
+import { parallelMap } from 'relign';
+
+const results = await parallelMap([1, 2, 3, 4], async (item) => {
+  return item * 2;
+})
+
+console.log(results); // [2, 4, 6, 8]
 ```
 
-#### Series
+__With an Object__
 
-```javascript
-relign.series(tasks) -> promise(results)
+```ts
+import { parallelMap } from 'relign';
+
+const results = await parallelMap({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (item) => {
+  return item * 2;
+})
+
+console.log(results); // { one: 2, two: 4, three: 6, four: 8 }
 ```
 
-Series provides a way for executing tasks in order. If all of your tasks happen to be promise returning functions then you could do this with an async function, but relign tasks can be any value [exec](#exec) accepts. This makes relign series much more flexible.
+## Parallel Map Limit
 
-Series accepts an array or object of tasks. It will execute each of the tasks in the key/index order they are defined in. It returns a promise that will resolve once all of the tasks have resolved.
+The `parallelMapLimit` function takes a collection of items, a map function, and
+a limit. It will then concurrently process each item in the collection with the
+map function with a limit on the number of items that can be processed at once.
+Note that the map function can return a promise or any other value. If a promise
+is returned, the result of the promise will be used as the value for the item in
+the results array. If any other value is returned, that value will be used as is.
 
-#### Parallel Map
+__With an Array__
 
-```javascript
-relign.parallelMap(items, worker(item, itemIndex, items) -> promise(result)) -> promise(results)
-relign.parallelMap(items, worker(item, itemIndex, items) -> result) -> promise(results)
+```ts
+import { parallelMapLimit } from 'relign';
+
+const results = await parallelMapLimit([1, 2, 3, 4], async (item) => {
+  return item * 2;
+}, 2)
+
+console.log(results); // [2, 4, 6, 8]
 ```
 
-If you've needed to process data concurrently you know how hard it can be. Parallel map makes the job of concurrently processing data much easier.
+__With an Object__
 
-Parallel map accepts an array or object and a worker function. The worker function is executed once for each value within the array/object. The item is passed as the first argument of the worker function. The worker can return a promise, or a value. Parallel map returns a promise which once the worker has been executed upon all of the items, and any promises it returned have resolved the returned promise will resolve.
+```ts
+import { parallelMapLimit } from 'relign';
 
-Below is an example of how you might take an array of resource urls, download each resource, then store the collection of resources.
+const results = await parallelMapLimit({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (item) => {
+  return item * 2;
+}, 2)
 
-```javascript
-relign.parallelMap(resourceUrls, url => download(url))
-  .then(resources => store(resources));
+console.log(results); // { one: 2, two: 4, three: 6, four: 8 }
 ```
 
-#### Parallel Map Limit
+## Series Map
 
-```javascript
-relign.parallelMapLimit(items, worker(item, itemIndex, items) -> promise(result), limit) -> promise(results)
+The `seriesMap` function takes a collection of items and a map function. It
+will then process each item in the collection with the map function in series.
+Note that the map function can return a promise or any other value. If a promise
+is returned, the result of the promise will be used as the value for the item in
+the results array. If any other value is returned, that value will be used as is.
+
+__With an Array__
+
+```ts
+import { seriesMap } from 'relign';
+
+const results = await seriesMap([1, 2, 3, 4], async (item) => {
+  return item * 2;
+})
+
+console.log(results); // [2, 4, 6, 8]
 ```
 
-Parallel map limit is just like parallel map, but it limits the maximum concurrency. When working with larger data sets you want to limit your maximum concurrently. parallel map is great for working with smaller data sets, but for larger ones the sensible thing to do is limit the maximum concurrency.
+__With an Object__
 
-Parallel map limit accepts an array or object and a worker function. The worker function is executed once for each value within the array/object. The item is passed as the first argument of the worker function. The worker can return a promise, or a value. Parallel map limit returns a promise which once the worker has been executed upon all of the items, and any promises it returned have resolved the returned promise will resolve.
+```ts
+import { seriesMap } from 'relign';
 
-Below is an example of how you might take an array of resource urls, download each resource, then store the collection of resources. In this example the number of resources that can be downloaded at once is six.
+const results = await seriesMap({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (item) => {
+  return item * 2;
+})
 
-```javascript
-relign.parallelMap(resourceUrls, url => download(url), 6)
-  .then(resources => store(resources));
+console.log(results); // { one: 2, two: 4, three: 6, four: 8 }
 ```
 
-#### Series Map
+## Parallel Filter
 
-```javascript
-relign.seriesMap(items, worker(item, itemIndex, items) -> promise(result)) -> promise(results)
+The `parallelFilter` function takes a collection of items and a filter function.
+It will then concurrently process each item in the collection with the filter
+function. Note that the filter function can return a promise that resolves to a
+boolean or a boolean. The boolean will be used to determine if the item should
+be included in the results.
+
+__With an Array__
+
+```ts
+import { parallelFilter } from 'relign';
+
+const results = await parallelFilter([1, 2, 3, 4], async (item) => {
+  return item % 2 === 0;
+})
+
+console.log(results); // [2, 4]
 ```
 
-In the event you have to process a data set serially with asynchronous logic then you probably need series map.
+__With an Object__
 
-Series map accepts an array or object and a worker function. The worker function is executed once for each value within the array/object. The item is passed as the first argument of the worker function. The worker can return a promise, or a value. Series map returns a promise which once the worker has been executed upon all of the items, and any promises it returned have resolved the returned promise will resolve.
+```ts
+import { parallelFilter } from 'relign';
 
-#### Parallel Flat Map
+const results = await parallelFilter({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (item) => {
+  return item % 2 === 0;
+})
 
-```javascript
-relign.parallelFlatMap(items, worker(item, itemIndex, items) -> promise(results)) -> promise(results)
+console.log(results); // { two: 2, four: 4 }
 ```
 
-#### Series Flat Map
+## Parallel Filter Limit
 
-```javascript
-relign.seriesFlatMap(items, worker(item, itemIndex, items) -> promise(results)) -> promise(results)
+The `parallelFilterLimit` function takes a collection of items, a filter
+function, and a limit. It will then concurrently process each item in the
+collection with the filter function with a limit on the number of items that can
+be processed at once. Note that the filter function can return a promise that
+resolves to a boolean or a boolean. The boolean will be used to determine if the
+item should be included in the results.
+
+__With an Array__
+
+```ts
+import { parallelFilterLimit } from 'relign';
+
+const results = await parallelFilterLimit([1, 2, 3, 4], async (item) => {
+  return item % 2 === 0;
+}, 2)
+
+console.log(results); // [2, 4]
 ```
 
-#### Parallel Filter
+__With an Object__
 
-```javascript
-relign.parallelFilter(items, tester(item, itemIndex, items) -> promise(isMatch)) -> promise(filteredItems)
-relign.parallelFilter(items, tester(item, itemIndex, items) -> isMatch) -> promise(filteredItems)
+```ts
+import { parallelFilterLimit } from 'relign';
+
+const results = await parallelFilterLimit({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (item) => {
+  return item % 2 === 0;
+}, 2)
+
+console.log(results); // { two: 2, four: 4 }
 ```
 
-#### Parallel Filter Limit
+## Series Filter
 
-```javascript
-relign.parallelFilterLimit(items, tester(item, itemIndex, items) -> promise(isMatch)) -> promise(filteredItems)
-relign.parallelFilterLimit(items, tester(item, itemIndex, items) -> isMatch) -> promise(filteredItems)
+The `seriesFilter` function takes a collection of items and a filter function.
+It will then process each item in the collection with the filter function in
+series. Note that the filter function can return a promise that resolves to a
+boolean or a boolean. The boolean will be used to determine if the item should
+be included in the results.
+
+__With an Array__
+
+```ts
+import { seriesFilter } from 'relign';
+
+const results = await seriesFilter([1, 2, 3, 4], async (item) => {
+  return item % 2 === 0;
+})
+
+console.log(results); // [2, 4]
 ```
 
-#### Series Filter
+__With an Object__
 
-```javascript
-relign.seriesFilter(items, tester(item, itemIndex, items) -> promise(isMatch)) -> promise(filteredItems)
-relign.seriesFilter(items, tester(item, itemIndex, items) -> isMatch) -> promise(filteredItems)
+```ts
+import { seriesFilter } from 'relign';
+
+const results = await seriesFilter({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (item) => {
+  return item % 2 === 0;
+})
+
+console.log(results); // { two: 2, four: 4 }
 ```
 
-#### Series Reduce
+## Parallel Find
 
-```javascript
-relign.seriesReduce(items, worker(val, item, itemIndex, items) -> promise(val), val) -> promise(result)
+The `parallelFind` function takes a collection of items and a find function. It
+will then concurrently execute the find function on each item in the collection
+until the find function returns a promise that resolves to true, or true. The
+first item to result in true being returned or resolved will be returned as the
+result. If no item results in true, undefined will be returned.
+
+__With an Array__
+
+```ts
+import { parallelFind } from 'relign';
+
+const result = await parallelFind([1, 2, 3, 4], async (item) => {
+  return item === 3;
+})
+
+console.log(result); // 3
 ```
 
-#### Parallel Find
+__With an Object__
 
-```javascript
-relign.parallelFind(items, tester(item, itemIndex, items) -> promise(isMatch)) -> promise(item)
-relign.parallelFind(items, tester(item, itemIndex, items) -> isMatch) -> promise(item)
+```ts
+import { parallelFind } from 'relign';
+
+const result = await parallelFind({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (item) => {
+  return item === 3;
+})
+
+console.log(result); // 3
 ```
 
-#### Parallel Find Limit
+## Parallel Find Limit
 
-```javascript
-relign.parallelFindLimit(items, tester(item, itemIndex, items) -> promise(isMatch), limit) -> promise(item)
-relign.parallelFindLimit(items, tester(item, itemIndex, items) -> isMatch, limit) -> promise(item)
+The `parallelFindLimit` function takes a collection of items, a find function,
+and a limit. It will then concurrently execute the find function on each item in
+the collection with a limit on the number of items that can be processed at
+once. The find function will be executed on each item in the collection until
+the find function returns a promise that resolves to true, or true. The first
+item to result in true being returned or resolved will be returned as the
+result. If no item results in true, undefined will be returned.
+
+__With an Array__
+
+```ts
+import { parallelFindLimit } from 'relign';
+
+const result = await parallelFindLimit([1, 2, 3, 4], async (item) => {
+  return item === 3;
+}, 2)
+
+console.log(result); // 3
 ```
 
-#### Series Find
+__With an Object__
 
-```javascript
-relign.seriesFind(items, tester(item, itemIndex, items) -> promise(isMatch)) -> promise(item)
-relign.seriesFind(items, tester(item, itemIndex, items) -> isMatch) -> promise(item)
+```ts
+import { parallelFindLimit } from 'relign';
+
+const result = await parallelFindLimit({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (item) => {
+  return item === 3;
+}, 2)
+
+console.log(result); // 3
 ```
 
-#### Parallel Concat
+## Series Find
 
-```javascript
-relign.parallelConcat(items, worker(item, itemIndex, items) -> promise(result)) -> promise(results)
-relign.parallelConcat(items, worker(item, itemIndex, items) -> result) -> promise(results)
+The `seriesFind` function takes a collection of items and a find function. It
+will then execute the find function on each item in the collection in series
+until the find function returns a promise that resolves to true, or true. The
+first item to result in true being returned or resolved will be returned as the
+result. If no item results in true, undefined will be returned.
+
+__With an Array__
+
+```ts
+import { seriesFind } from 'relign';
+
+const result = await seriesFind([1, 2, 3, 4], async (item) => {
+  return item === 3;
+})
+
+console.log(result); // 3
 ```
 
-#### Series Concat
+__With an Object__
 
-```javascript
-relign.seriesConcat(items, worker(item, itemIndex, items) -> promise(result)) -> promise(results)
-relign.seriesConcat(items, worker(item, itemIndex, items) -> result) -> promise(results)
+```ts
+import { seriesFind } from 'relign';
+
+const result = await seriesFind({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (item) => {
+  return item === 3;
+})
+
+console.log(result); // 3
 ```
 
-### Utilities
+## Parallel Flat Map
 
-#### Exec
+The `parallelFlatMap` function takes a collection of items and a flat map function.
+It will then concurrently execute the flat map function on each item in the
+collection. Note that the flat map function can return a promise that resolves
+to an array or an array. The array will be flattened into the result.
 
-```javascript
-relign.exec(fn() => promise(result)) -> promise(result)
-relign.exec(fn(cb(err, result))) -> promise(result)
-relign.exec(*gen() => promise(result)) -> promise([results])
-relign.exec(fn() => result) -> promise(result)
-relign.exec(value) -> promise(value)
+__With an Array__
+
+```ts
+import { parallelFlatMap } from 'relign';
+
+const results = await parallelFlatMap([1, 2, 3, 4], async (item) => {
+  return [item, item];
+})
+
+console.log(results); // [1, 1, 2, 2, 3, 3, 4, 4]
 ```
 
-Exec is used to convert any value to a promise. It's used extensively by relign internally for normalizing tasks. Exec makes relign a breeze to use because with it you can treat all functions as values. If given a function exec will execute it. Should the function return a promise then exec will return it. If the function instead returns a value, then relign will return a promise that resolves the value immediately. If exec is passed a promise, then it will return the promise. If exec is passed any other type of value other than a function, it will return a promise that resolves the value immediately.
+__With an Object__
 
-#### Next Tick
+```ts
+import { parallelFlatMap } from 'relign';
 
-```javascript
-relign.nextTick(fn() -> promise(result)) -> promise(result)
-relign.nextTick(fn() -> result) -> promise(result)
-relign.nextTick(value) -> promise(value)
-relign.nextTick() -> promise()
+const results = await parallelFlatMap({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (item) => {
+  return [item, item];
+})
+
+console.log(results); // [1, 1, 2, 2, 3, 3, 4, 4]
 ```
 
-Next tick is a wrapper for node's built in next tick. It executes a given
-function in the following tick, and resolves in the value returned or resolved
-by the function. If a value is given instead of a function, then the value will
-be resolved the following tick.
+## Parallel Flat Map Limit
 
-#### Set Interval
+The `parallelFlatMapLimit` function takes a collection of items, a flat map
+function, and a limit. It will then concurrently execute the flat map function
+on each item in the collection with a limit on the number of items that can be
+processed at once. Note that the flat map function can return a promise that
+resolves to an array or an array. The array will be flattened into the result.
 
-```javascript
-relign.setInterval(fn() -> promise(), duration) -> intervalPromise()
-relign.setInterval(fn(), duration) -> intervalPromise()
+__With an Array__
+
+```ts
+import { parallelFlatMapLimit } from 'relign';
+
+const results = await parallelFlatMapLimit([1, 2, 3, 4], async (item) => {
+  return [item, item];
+}, 2)
+
+console.log(results); // [1, 1, 2, 2, 3, 3, 4, 4]
 ```
 
-#### Set Timeout
+__With an Object__
 
-```javascript
-relign.setTimeout(fn() -> promise(result), duration) -> timeoutPromise(result)
-relign.setTimeout(fn() -> result, duration) -> timeoutPromise(result)
-relign.setTimeout(value, duration) -> timeoutPromise(value)
-relign.setTimeout(duration) -> timeoutPromise()
+```ts
+import { parallelFlatMapLimit } from 'relign';
+
+const results = await parallelFlatMapLimit({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (item) => {
+  return [item, item];
+}, 2)
+
+console.log(results); // [1, 1, 2, 2, 3, 3, 4, 4]
 ```
+
+## Series Flat Map
+
+The `seriesFlatMap` function takes a collection of items and a flat map
+function. It will then execute the flat map function on each item in the
+collection in series. Note that the flat map function can return a promise that
+resolves to an array or an array. The array will be flattened into the result.
+
+__With an Array__
+
+```ts
+import { seriesFlatMap } from 'relign';
+
+const results = await seriesFlatMap([1, 2, 3, 4], async (item) => {
+  return [item, item];
+})
+
+console.log(results); // [1, 1, 2, 2, 3, 3, 4, 4]
+```
+
+__With an Object__
+
+```ts
+import { seriesFlatMap } from 'relign';
+
+const results = await seriesFlatMap({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (item) => {
+  return [item, item];
+})
+
+console.log(results); // [1, 1, 2, 2, 3, 3, 4, 4]
+```
+
+## Series Reduce
+
+The `seriesReduce` function takes a collection of items, a reducer function,
+and an initial value. It will then execute the reducer function on each item in
+the collection in series. The result of the reducer function can be a promise
+or any value. If the reducer function returns a promise, the result of the
+promise will be used as the memo for the next iteration, otherwise
+the return value will be used as the memo. After all items have been processed,
+the memo will be returned as the result.
+
+__With an Array__
+
+```ts
+import { seriesReduce } from 'relign';
+
+const result = await seriesReduce([1, 2, 3, 4], async (memo, item) => {
+  return memo + item;
+}, 0)
+
+console.log(result); // 10
+```
+
+__With an Object__
+
+```ts
+import { seriesReduce } from 'relign';
+
+const result = await seriesReduce({
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+}, async (memo, item) => {
+  return memo + item;
+}, 0)
+
+console.log(result); // 10
+```
+
+## Next Tick
+
+The `nextTick` function returns a promise that resolves on the next tick of the
+event loop. If used in a browser, requestAnimationFrame under the hood instead
+of node's process.nextTick.
+
+```ts
+import { nextTick } from 'relign';
+
+await nextTick();
+```
+
+Next tick can also take a task or value as an argument. If a task is passed,
+the task will be executed on the next tick of the event loop and the promise
+will resolve to the result of the task. If a value is passed, the promise will
+resolve to the value on the next tick of the event loop.
+
+```ts
+import { nextTick } from 'relign';
+
+const result = await nextTick(() => {
+  return 'hello world';
+});
+
+console.log(result); // 'hello world'
+```
+
+## Set Timeout
+
+The `setTimeout` takes a delay and returns a promise that resolves after the
+delay has elapsed.
+
+```ts
+import { setTimeout } from 'relign';
+
+await setTimeout(1000);
+```
+
+Set timeout can also take a task or value as an argument. If a task is passed,
+the task will be executed after the delay has elapsed and the promise will
+resolve to the result of the task. If a value is passed, the promise will
+resolve to the value after the delay has elapsed.
+
+```ts
+import { setTimeout } from 'relign';
+
+const result = await setTimeout(1000, () => {
+  return 'hello world';
+});
+
+console.log(result); // 'hello world'
+```
+
+## Set Interval
+
+The `setInterval` takes a task and a interval duration. It will call the task
+every interval period until the task throws, or executes the resolve function
+passed to it. The promise returned by setInterval will not resolve until the
+task throws or executes the resolve function passed to it. If the task calls
+the resolve function and passes a value, the promise will resolve to that
+value.
+
+```ts
+import { setInterval } from 'relign';
+
+let count = 0;
+
+const result = await setInterval(1000, (resolve) => {
+  count += 1;
+
+  if (count === 5) {
+    resolve(count);
+  }
+});
+
+console.log(result); // 5
+```
+
+## Callback to Promise
+
+The `cbToPromise` function takes a function that uses the error first callback
+pattern and returns a function that returns a promise. The returned function
+will call the original function and resolve or reject the promise based on the
+error first callback.
+
+```ts
+import { cbToPromise } from 'relign';
+
+const readFile = cbToPromise(fs.readFile);
+
+const result = await readFile('./package.json', 'utf8');
+
+console.log(result); // package.json contents
+```
+
+## Execute
+
+The `exec` function is the heart of relign and is used by a majority of the
+functions above. The execute function takes a task or value and executes it.
+If the task is a function, it will be called and the result will be returned.
+If the task is a promise, the promise will be awaited and the result will be
+returned. If the task is any other value, the value will be returned.
+
+```ts
+import { exec } from 'relign';
+
+const result = exec(() => {
+  return 'hello world';
+});
+
+console.log(result); // 'hello world'
+```
+
+## Help Welcome
+
+If you want to support this project by throwing be some coffee money It's
+greatly appreciated.
+
+[![sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/RobertWHurst)
+
+If your interested in providing feedback or would like to contribute please feel
+free to do so. I recommend first [opening an issue][feature-request] expressing
+your feedback or intent to contribute a change, from there we can consider your
+feedback or guide your contribution efforts. Any and all help is greatly
+appreciated since this is an open source effort after all.
+
+Thank you!
+
+[npm]: https://www.npmjs.com
+[async]: https://github.com/caolan/async
+[bug-report]: https://github.com/RobertWHurst/Relign/issues/new?template=bug_report.md
+[feature-request]: https://github.com/RobertWHurst/Relign/issues/new?template=feature_request.md

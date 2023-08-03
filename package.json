@@ -1,24 +1,33 @@
 {
   "name": "relign",
-  "version": "0.11.0",
-  "description": "Relign is a control flow library for promises heavily inspired by async",
-  "main": "index.js",
+  "version": "1.0.0-alpha-1",
+  "description": "Relign is a control flow library for promises inspired by async",
+  "main": "./index.js",
+  "files": [
+    "./*.js",
+    "license.txt",
+    "Readme.md"
+  ],
   "scripts": {
-    "test": "mocha --bail test/*.spec.js",
-    "cover": "istanbul cover _mocha test/*.spec.js"
+    "build": "vite build",
+    "test": "vitest run",
+    "lint": "eslint ./src"
   },
+  "pre-commit": [
+    "lint",
+    "build",
+    "test"
+  ],
   "author": "Robert Hurst <robertwhurst@gmail.com>",
   "license": "MIT",
-  "devDependencies": {
-    "istanbul": "^0.4.5",
-    "mocha": "^7.2.0",
-    "pre-commit": "^1.2.2",
-    "sinon": "^9.0.2"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/RobertWHurst/relign.git"
   },
+  "bugs": {
+    "url": "https://github.com/RobertWHurst/relign/issues"
+  },
+  "homepage": "https://github.com/RobertWHurst/relign#readme",
   "keywords": [
     "async",
     "control flow",
@@ -28,25 +37,20 @@
     "parallel",
     "series",
     "async map",
-    "map"
+    "map",
+    "typescript"
   ],
-  "bugs": {
-    "url": "https://github.com/RobertWHurst/relign/issues"
-  },
-  "homepage": "https://github.com/RobertWHurst/relign#readme",
-  "browserify": {
-    "transform": [
-      [
-        "babelify",
-        {
-          "presets": [
-            "env"
-          ]
-        }
-      ]
-    ]
-  },
-  "pre-commit": [
-    "test"
-  ]
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.2",
+    "@types/node": "^20.4.4",
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/parser": "^6.1.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.6",
+    "vitest": "^0.33.0"
+  }
 }
