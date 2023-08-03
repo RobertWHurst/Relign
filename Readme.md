@@ -85,19 +85,15 @@ __Items__
 - [parallelMap](#parallel-map)
 - [parallelMapLimit](#parallel-map-limit)
 - [seriesMap](#series-map)
-
 - [parallelFilter](#parallel-filter)
 - [parallelFilterLimit](#parallel-filter-limit)
 - [seriesFilter](#series-filter)
-
 - [parallelFind](#parallel-find)
 - [parallelFindLimit](#parallel-find-limit)
 - [seriesFind](#series-find)
-
 - [parallelFlatMap](#parallel-flat-map)
 - [parallelFlatMapLimit](#parallel-flat-map-limit)
 - [seriesFlatMap](#series-flat-map)
-
 - [seriesReduce](#series-reduce)
 
 __Timing__
