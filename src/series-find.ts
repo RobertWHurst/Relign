@@ -10,7 +10,10 @@ export type SeriesFindFn<I extends SeriesFindItems> = (
   items: I,
 ) => Executable<boolean>
 
-export async function seriesFind<I extends SeriesFindItems>(items: I, fn: SeriesFindFn<I>) {
+export async function seriesFind<I extends SeriesFindItems>(
+  items: I,
+  fn: SeriesFindFn<I>,
+) {
   for (const propOrIndexStr of Object.keys(items)) {
     const item = items[propOrIndexStr as keyof I] as SeriesFindItem<I>
     const isArray = items instanceof Array

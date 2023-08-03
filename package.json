@@ -1,6 +1,6 @@
 {
   "name": "relign",
-  "version": "0.11.0",
+  "version": "1.0.0-alpha-1",
   "description": "Relign is a control flow library for promises inspired by async",
   "main": "./index.js",
   "files": [
