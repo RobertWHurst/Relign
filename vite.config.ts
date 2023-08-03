@@ -9,7 +9,6 @@ export default defineConfig({
       name: 'relign',
       fileName: 'index',
     },
-    outDir: '.',
   },
   plugins: [
     typescript({

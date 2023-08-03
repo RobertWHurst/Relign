@@ -77,41 +77,26 @@ that value will be returned as is.
 
 ## Function Index
 
-__Tasks Functions__
-
 - [parallel](#parallel)
 - [parallelLimit](#parallel-limit)
 - [series](#series)
 - [auto](#auto)
-
-__Items__
-
 - [parallelMap](#parallel-map)
 - [parallelMapLimit](#parallel-map-limit)
 - [seriesMap](#series-map)
-
 - [parallelFilter](#parallel-filter)
 - [parallelFilterLimit](#parallel-filter-limit)
 - [seriesFilter](#series-filter)
-
 - [parallelFind](#parallel-find)
 - [parallelFindLimit](#parallel-find-limit)
 - [seriesFind](#series-find)
-
 - [parallelFlatMap](#parallel-flat-map)
 - [parallelFlatMapLimit](#parallel-flat-map-limit)
 - [seriesFlatMap](#series-flat-map)
-
 - [seriesReduce](#series-reduce)
-
-__Timing__
-
 - [nextTick](#next-tick)
 - [setTimeout](#set-timeout)
 - [setInterval](#set-interval)
-
-__Promises__
-
 - [cbToPromise](#callback-to-promise)
 - [exec](#execute)
 

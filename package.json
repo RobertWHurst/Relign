@@ -2,44 +2,47 @@
   "name": "relign",
   "version": "1.0.0-alpha-1",
   "description": "Relign is a control flow library for promises inspired by async",
-  "main": "./index.js",
+  "type": "module",
+  "main": "dist/index.umd.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs"
+    }
+  },
   "files": [
-    "./*.js",
-    "license.txt",
-    "Readme.md"
+    "dist/*.js",
+    "dist/*.map",
+    "dist/*.d.ts",
+    "logo.png",
+    "readme.md"
   ],
   "scripts": {
-    "build": "vite build",
+    "lint": "eslint ./src",
     "test": "vitest run",
-    "lint": "eslint ./src"
+    "build": "vite build",
+    "dev": "vite build -w",
+    "prepublishOnly": "pnpm run build"
   },
-  "pre-commit": [
-    "lint",
-    "build",
-    "test"
+  "keywords": [
+    "control flow",
+    "concurrency",
+    "parallel limit",
+    "parallel",
+    "series",
+    "async",
+    "auto",
+    "relign"
   ],
   "author": "Robert Hurst <robertwhurst@gmail.com>",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RobertWHurst/relign.git"
-  },
+  "repository": "github:RobertWHurst/Relign",
   "bugs": {
-    "url": "https://github.com/RobertWHurst/relign/issues"
+    "email": "robertwhurst@gmail.com",
+    "url": "https://github.com/RobertWHurst/Keystrokes/issues/new?template=bug_report.md"
   },
-  "homepage": "https://github.com/RobertWHurst/relign#readme",
-  "keywords": [
-    "async",
-    "control flow",
-    "promises",
-    "yield",
-    "block",
-    "parallel",
-    "series",
-    "async map",
-    "map",
-    "typescript"
-  ],
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.2",
     "@types/node": "^20.4.4",
