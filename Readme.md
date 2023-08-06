@@ -22,8 +22,6 @@
 
 __If you encounter a bug please [report it][bug-report].__
 
-_ChatGPT says:_
-
 Relign is a little utility library for processing data and tasks in concurrent
 or serial patterns. It's heavily inspired by the wonderful library [async][async]
 which was widly used back in the bad old days of callback patterns popular in
